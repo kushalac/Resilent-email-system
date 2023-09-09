@@ -30,41 +30,39 @@ public class SignupController {
     private MyKafkaProducer kafkaproducer;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody User user) {
-    	try {
-    		
-    		String name = user.getName();
+    public ResponseEntity<Map<String, String>> signup(@RequestBody User user) {
+        try {
+            String name = user.getName();
             String email = user.getEmail();
             boolean receiveNotifications = user.isReceiveNotifications();
 
             if (name == null || name.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name is missing or empty");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Name is missing or empty"));
             } else if (email == null || email.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email is missing or empty");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Email is missing or empty"));
             } else if (!email.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid email format");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Invalid email format"));
             }
 
             User existingUser = userRepoCall.findByEmail(user.getEmail());
             if (existingUser != null) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already exists");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Email already exists"));
             }
             userRepoCall.save(user);
             if (receiveNotifications) {
-            	String topic = "signup-topic";
+                String topic = "signup-topic";
                 String subject = "Welcome to our service";
                 String message = "Hello " + name + ",\n\nWelcome to our service!";
 
                 kafkaproducer.sendMessage(name, email,topic,message,subject);
             }
-            return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User created successfully"));
         } catch (Exception e) {
             // Handle the exception, log it, and return an error response
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An error occurred"));
         }
     }
-
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     public List<User> getAllUsers() {

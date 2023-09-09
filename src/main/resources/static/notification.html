@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="signup-container">
+        <h1>Notifications</h1>
+        <button id="sendPromotions" class="signup-button">Send Promotions</button><br><br>
+        <button id="sendLatestPlans" class="signup-button">Send Latest Plans</button><br><br>
+        <button id="sendReleaseEvents" class="signup-button">Send Release Events</button><br><br>
+        <div id="notificationResult"></div>
+        <button onclick="window.location.href = 'signup.html';" class="signup-button">Home</button>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sendPromotionsBtn = document.getElementById("sendPromotions");
+            const sendLatestPlansBtn = document.getElementById("sendLatestPlans");
+            const sendReleaseEventsBtn = document.getElementById("sendReleaseEvents");
+            const notificationResult = document.getElementById("notificationResult");
+
+            // Function to send a notification
+            function sendNotification(endpoint) {
+                fetch(`/notification/${endpoint}`, {
+                    method: 'GET',
+                })
+                .then((response) => response.text())
+                .then((data) => {
+                    notificationResult.innerText = data;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    notificationResult.innerText = 'An error occurred. Please try again later.';
+                });
+            }
+
+            // Add event listeners to the buttons
+            sendPromotionsBtn.addEventListener("click", function () {
+                sendNotification("promotions");
+            });
+
+            sendLatestPlansBtn.addEventListener("click", function () {
+                sendNotification("latestplans");
+            });
+
+            sendReleaseEventsBtn.addEventListener("click", function () {
+                sendNotification("releaseevents");
+            });
+        });
+    </script>
+</body>
+</html>

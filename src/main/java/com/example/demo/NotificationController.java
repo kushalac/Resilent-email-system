@@ -41,14 +41,14 @@ public class NotificationController {
     @GetMapping("/latestplans")
     @ResponseBody
     public String sendLatestPlansEmail() {
-        sendNotificationEmail("latest plans","LatestPlan subject", "Check out our latest plans!");
+        sendNotificationEmail("latestPlans","LatestPlan subject", "Check out our latest plans!");
         return "Latest plans emails sent!";
     }
 
     @GetMapping("/releaseevents")
     @ResponseBody
     public String sendReleaseEventsEmail() {
-        sendNotificationEmail("release events","release eveny subject", "New release events are here!");
+        sendNotificationEmail("releaseEvents","release eveny subject", "New release events are here!");
         return "Release events emails sent!";
     }
     

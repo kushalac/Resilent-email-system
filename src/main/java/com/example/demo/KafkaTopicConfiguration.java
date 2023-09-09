@@ -24,7 +24,7 @@ public class KafkaTopicConfiguration {
     }
 
     @Bean
-    public NewTopic promotionsTopic() {
+    public NewTopic promotionsTopic() {   //add validity or set time period
         return createNewTopic("promotions-topic");
     }
 
