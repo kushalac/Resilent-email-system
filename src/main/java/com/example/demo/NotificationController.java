@@ -3,6 +3,7 @@ package com.example.demo;
 import com.example.demo.User;
 import com.example.demo.UserRepository;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,28 +32,39 @@ public class NotificationController {
     
     @Autowired
     private MyKafkaProducer kafkaproducer;
-
-    @GetMapping("/promotions")
-    @ResponseBody
-    public String sendPromotionsEmail() {
-        sendNotificationEmail("promotions","Promotion subject", "promotions code 1");
-        return "Promotions emails sent!";
-    }
-
-    @GetMapping("/latestplans")
-    @ResponseBody
-    public String sendLatestPlansEmail() {
-        sendNotificationEmail("latestPlans","LatestPlan subject", "Check out our latest plans!");
-        return "Latest plans emails sent!";
-    }
-
-    @GetMapping("/releaseevents")
-    @ResponseBody
-    public String sendReleaseEventsEmail() {
-        sendNotificationEmail("releaseEvents","release eveny subject", "New release events are here!");
-        return "Release events emails sent!";
-    }
     
+    @Autowired
+    private  NotificationRepository notificationRepoCall;
+
+	/*
+	 * @GetMapping("/promotions")
+	 * 
+	 * @ResponseBody public String sendPromotionsEmail() {
+	 * sendNotificationEmail("promotions","Promotion subject", "promotions code 1");
+	 * return "Promotions emails sent!"; }
+	 * 
+	 * @GetMapping("/latestplans")
+	 * 
+	 * @ResponseBody public String sendLatestPlansEmail() {
+	 * sendNotificationEmail("latestPlans","LatestPlan subject",
+	 * "Check out our latest plans!"); return "Latest plans emails sent!"; }
+	 * 
+	 * @GetMapping("/releaseevents")
+	 * 
+	 * @ResponseBody public String sendReleaseEventsEmail() {
+	 * sendNotificationEmail("releaseEvents","release eveny subject",
+	 * "New release events are here!"); return "Release events emails sent!"; }
+	 */
+    
+    @PostMapping("/createNewNotification")
+    public void createNewNotification(@RequestBody Notification notification) {
+			String topic=notification.getNotificationType();
+			String subject= notification.getNotificationSubject();
+			String message= notification.getNotificationContent();
+			sendNotificationEmail(topic,subject,message,notification);
+			notificationRepoCall.save(notification);
+        }
+
       
     @PatchMapping("/updateuser")
     @ResponseBody
@@ -81,7 +94,7 @@ public class NotificationController {
         }
     }
 
-    private void sendNotificationEmail(String notificationType,String subject, String message) {
+    private void sendNotificationEmail(String notificationType,String subject, String message, Notification notification) {
         Iterable<User> users = userRepository.findAll();
         for (User user : users) {
             if (user.isReceiveNotifications() && user.getNotifications().containsKey(notificationType)
@@ -91,7 +104,8 @@ public class NotificationController {
                 String topic = notificationType.replaceAll("\\s+", "-").toLowerCase() + "-topic";
                 kafkaproducer.sendMessage(name,email,topic,message,subject);
                 kafkaTemplate.send(topic, message);
+                notification.getUserList().add(user.getId());
             }
-        }
+            }
     }
 }
