@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -19,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
-@Controller
+@RestController
 @RequestMapping("/notification")
 public class NotificationController {
 
@@ -35,6 +39,9 @@ public class NotificationController {
     
     @Autowired
     private  NotificationRepository notificationRepoCall;
+    
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
 	/*
 	 * @GetMapping("/promotions")
@@ -56,14 +63,27 @@ public class NotificationController {
 	 * "New release events are here!"); return "Release events emails sent!"; }
 	 */
     
-    @PostMapping("/createNewNotification")
+    
+    @PostMapping("/NewNotification")
     public void createNewNotification(@RequestBody Notification notification) {
-			String topic=notification.getNotificationType();
+			String id=notification.getNotificationId();
+    		String topic=notification.getNotificationType();
 			String subject= notification.getNotificationSubject();
 			String message= notification.getNotificationContent();
-			sendNotificationEmail(topic,subject,message,notification);
-			notificationRepoCall.save(notification);
-        }
+			
+			if(notificationRepoCall.existsByNotificationId(id))
+			{
+				Notification existnotification = notificationRepoCall.findById(id).orElse(null);
+				sendNotificationEmail(topic,subject,message,existnotification);
+			}
+			
+			else
+			{
+				notificationRepoCall.save(notification);
+				sendNotificationEmail(topic,subject,message,notification);
+				
+			}
+    }
 
       
     @PatchMapping("/updateuser")
@@ -94,18 +114,25 @@ public class NotificationController {
         }
     }
 
-    private void sendNotificationEmail(String notificationType,String subject, String message, Notification notification) {
-        Iterable<User> users = userRepository.findAll();
-        for (User user : users) {
-            if (user.isReceiveNotifications() && user.getNotifications().containsKey(notificationType)
-                    && user.getNotifications().get(notificationType)) {
-            	String name=user.getName();
-                String email = user.getEmail();
-                String topic = notificationType.replaceAll("\\s+", "-").toLowerCase() + "-topic";
-                kafkaproducer.sendMessage(name,email,topic,message,subject);
-                kafkaTemplate.send(topic, message);
-                notification.getUserList().add(user.getId());
-            }
-            }
+    private void sendNotificationEmail(String notificationType, String subject, String message, Notification notification) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("receiveNotifications").is(true)
+                                 .and("notifications." + notificationType).is(true)
+                                 .and("id").nin(notification.getUserList()));
+
+        List<User> eligibleUsers = mongoTemplate.find(query, User.class);
+        //System.out.println(eligibleUsers);
+        for (User user : eligibleUsers) {
+            String name = user.getName();
+            String email = user.getEmail();
+            String topic = notificationType.replaceAll("\\s+", "-").toLowerCase() + "-topic";
+            kafkaproducer.sendMessage(name, email, topic, message, subject);
+            kafkaTemplate.send(topic, message);
+            notification.getUserList().add(user.getId());
+        }
+
+        
+        notificationRepoCall.save(notification);
     }
-}
+
+    }

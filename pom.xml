@@ -25,7 +25,11 @@
     			<groupId>org.springframework.boot</groupId>
     			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
-
+		<dependency>
+        	<groupId>org.mongodb</groupId>
+        	<artifactId>mongo-java-driver</artifactId>
+        	<version>3.12.14</version> <!-- Specify the desired version -->
+    	</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
