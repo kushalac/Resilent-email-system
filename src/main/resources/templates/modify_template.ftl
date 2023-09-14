@@ -3,7 +3,7 @@
 <head>
     <title>Account Modification</title>
     <style>
-        /* Add your CSS styles here */
+   
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f8f8;
@@ -34,7 +34,7 @@
         }
 
         .header {
-            background-color: #007bff;
+            background-color: #90b2d6;
             color: #fff;
             text-align: center;
             padding: 15px 0;
@@ -49,7 +49,7 @@
             <h1>Account Modification</h1>
         </div>
         <p>Hello <span style="font-weight: bold;">${name}</span>,</p>
-        <p>Your account has been modified.</p>
+        <p>Your account has been modified.</p><p>${status}</p>
         <p>If you have any questions or need assistance, please don't hesitate to reach out to our support team</p>
     </div>
 </body>

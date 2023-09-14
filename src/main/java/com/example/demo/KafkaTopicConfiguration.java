@@ -30,22 +30,27 @@ public class KafkaTopicConfiguration {
 
     @Bean
     public NewTopic latestPlansTopic() {
-        return createNewTopic("latest-plans-topic");
+        return createNewTopic("latestPlans-topic");
     }
 
     @Bean
     public NewTopic releaseEventsTopic() {
-        return createNewTopic("release-events-topic");
+        return createNewTopic("releaseEvents-topic");
     }
     
     @Bean
     public NewTopic accountDeletedTopic() {
         return createNewTopic("account-deleted-topic");
     }
-
+    
     @Bean
     public NewTopic accountModifiedTopic() {
         return createNewTopic("account-modified-topic");
+    }
+    
+    @Bean
+    public NewTopic accountConfirmDeletedTopic() {
+        return createNewTopic("deleteConfirmation-topic");
     }
     
     private NewTopic createNewTopic(String topicName) {

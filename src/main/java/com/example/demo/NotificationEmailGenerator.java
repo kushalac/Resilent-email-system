@@ -20,7 +20,7 @@ public class NotificationEmailGenerator {
 
     public String generateNotificationEmailContent(String name, String content) {
         try {
-            String templatename = "demo.ftl";
+            String templatename = "notification_template.ftl";
 
             Template template = freemarkerConfig.getTemplate(templatename);
 

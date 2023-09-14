@@ -66,37 +66,6 @@ public class UserController {
         }
     }
     
-    @DeleteMapping("/deleteUser")
-    public ResponseEntity<Map<String, String>> deleteUser(@RequestBody Map<String, String> requestBody) {
-        try {
-            String email = requestBody.get("email");
-
-            if (email == null || email.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Email is missing or empty"));
-            }
-
-            User userToDelete = userRepoCall.findByEmail(email);
-
-            if (userToDelete == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "User with email " + email + " not found"));
-            }
-
-            // Delete the user from the database
-            //userRepoCall.delete(userToDelete);
-
-            // Send a notification to the user about account deletion
-            String topic = "account-deleted-topic";
-
-            kafkaproducer.sendMessage(topic,email);
-            
-            return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonMap("message", "User with email " + email + " has been deleted"));
-        } catch (Exception e) {
-            // Handle the exception, log it, and return an error response
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "An error occurred"));
-        }
-    }
-    
     
     @PutMapping("/userUpdate")
     public ResponseEntity<String> updateUserByEmail(@RequestBody User updatedUser) {

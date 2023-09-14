@@ -23,68 +23,80 @@ public class MyNotificationConsumer {
     private NotificationEmailGenerator notificationEmailGenerator;
     
     @KafkaListener(topics = "promotions-topic")
-    public void sendPromotionEmail(String info){
-    	System.out.println("Received in promotion consumer");
-    	String delimiter = "%";
+    public void sendPromotionEmail(String info) {
+        System.out.println("Received in promotion consumer");
+        String delimiter = "%";
         String[] parts = info.split(delimiter);
-        String email=parts[0];
-        String id = parts[1];
-        Optional<Notification> optionalNotification = NotificationRepoCall.findById(id);
-        User user = userRepoCall.findByEmail(email);
-        String name = user.getName();
-        if (optionalNotification.isPresent())
-        {
-            Notification notification = optionalNotification.get();    
-            String subject = notification.getNotificationSubject();
-            String content = notification.getNotificationContent();
-        
-            String emailContent= notificationEmailGenerator.generateNotificationEmailContent(name,content);
-            EmailSender.sendEmail(email, subject, emailContent);
+
+        if (parts.length >= 2) {
+            String email = parts[0];
+            String id = parts[1];
+            Optional<Notification> optionalNotification = NotificationRepoCall.findById(id);
+            User user = userRepoCall.findByEmail(email);
+            String name = user.getName();
+            if (optionalNotification.isPresent()) {
+                Notification notification = optionalNotification.get();
+                String subject = notification.getNotificationSubject();
+                String content = notification.getNotificationContent();
+                String emailContent = notificationEmailGenerator.generateNotificationEmailContent(name, content);
+                EmailSender.sendEmail(email, subject, emailContent);
+            }
+        } else {
+            // Handle the case where the message format is incorrect.
+            // You can log an error or take appropriate action.
+            System.err.println("Invalid message format received: " + info);
         }
-   }
+    }
     
-    @KafkaListener(topics = "latest-plans-topic")
-    public void sendLatestPlanEmail(String info){
-    	System.out.println("Received in latest-plan consumer");
-    	String delimiter = "%";
+    @KafkaListener(topics = "latestPlans-topic")
+    public void sendLatestPlansEmail(String info) {
+        System.out.println("Received in latest-plans consumer");
+        String delimiter = "%";
         String[] parts = info.split(delimiter);
-        String email=parts[0];
-        String id = parts[1];
-        Optional<Notification> optionalNotification = NotificationRepoCall.findById(id);
-        User user = userRepoCall.findByEmail(email);
-        String name = user.getName();
-        if (optionalNotification.isPresent())
-        {
-            Notification notification = optionalNotification.get();    
-            String subject = notification.getNotificationSubject();
-            String content = notification.getNotificationContent();
-        
-            String emailContent= notificationEmailGenerator.generateNotificationEmailContent(name,content);
-            EmailSender.sendEmail(email, subject, emailContent);
+
+        if (parts.length >= 2) {
+            String email = parts[0];
+            String id = parts[1];
+            Optional<Notification> optionalNotification = NotificationRepoCall.findById(id);
+            User user = userRepoCall.findByEmail(email);
+            String name = user.getName();
+            if (optionalNotification.isPresent()) {
+                Notification notification = optionalNotification.get();
+                String subject = notification.getNotificationSubject();
+                String content = notification.getNotificationContent();
+                String emailContent = notificationEmailGenerator.generateNotificationEmailContent(name, content);
+                EmailSender.sendEmail(email, subject, emailContent);
+            }
+        } else {
+            // Handle the case where the message format is incorrect.
+            // You can log an error or take appropriate action.
+            System.err.println("Invalid message format received: " + info);
         }
-   }
+    }
     
-    @KafkaListener(topics = "release-events-topic")
-    public void sendReleaseEventEmail(String info){
-    	System.out.println("Received in release-event consumer");
-    	String delimiter = "%";
+    @KafkaListener(topics = "releaseEvents-topic")
+    public void sendRelaeseEventEmail(String info) {
+        System.out.println("Received in release-events consumer");
+        String delimiter = "%";
         String[] parts = info.split(delimiter);
-        String email=parts[0];
-        String id = parts[1];
-        System.out.println(email);
-        System.out.println(id);
-        System.out.println(info);
-        Optional<Notification> optionalNotification = NotificationRepoCall.findById(id);
-        User user = userRepoCall.findByEmail(email);
-        String name = user.getName();
-        if (optionalNotification.isPresent())
-        {
-            Notification notification = optionalNotification.get();    
-            String subject = notification.getNotificationSubject();
-            String content = notification.getNotificationContent();
-        
-            String emailContent= notificationEmailGenerator.generateNotificationEmailContent(name,content);
-            EmailSender.sendEmail(email, subject, emailContent);
+
+        if (parts.length >= 2) {
+            String email = parts[0];
+            String id = parts[1];
+            Optional<Notification> optionalNotification = NotificationRepoCall.findById(id);
+            User user = userRepoCall.findByEmail(email);
+            String name = user.getName();
+            if (optionalNotification.isPresent()) {
+                Notification notification = optionalNotification.get();
+                String subject = notification.getNotificationSubject();
+                String content = notification.getNotificationContent();
+                String emailContent = notificationEmailGenerator.generateNotificationEmailContent(name, content);
+                EmailSender.sendEmail(email, subject, emailContent);
+            }
+        } else {
+            // Handle the case where the message format is incorrect.
+            // You can log an error or take appropriate action.
+            System.err.println("Invalid message format received: " + info);
         }
-   }
+    }
 }

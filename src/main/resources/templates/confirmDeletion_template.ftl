@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Account Deletion</title>
+    <title>Welcome to Our Platform</title>
     <style>
-        /* Add your CSS styles here */
+      
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f8f8;
@@ -41,30 +41,19 @@
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
         }
-
-        .confirmation-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .confirmation-button:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Account Deleted</h1>
+            <h1>Confirm your Deletion</h1>
         </div>
         <p>Hello <span style="font-weight: bold;">${name}</span>,</p>
-        <p>Thank you for your presence, yor account has been deleted</p>
-       
+        <p>Your account deletion process has been initiated.</p>
+        <p>Please click on the following button to confirm the deletion:</p>
+        <p>${content}</p>
+        <p>If you have any questions or need assistance, please don't hesitate to reach out to our support team</p>
+        
     </div>
 </body>
 </html>

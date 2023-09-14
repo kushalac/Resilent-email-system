@@ -3,7 +3,7 @@
 <head>
     <title>Welcome to Our Platform</title>
     <style>
-        /* Add your CSS styles here */
+      
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f8f8;
@@ -34,7 +34,7 @@
         }
 
         .header {
-            background-color: #007bff;
+            background-color: #90b2d6;
             color: #fff;
             text-align: center;
             padding: 15px 0;

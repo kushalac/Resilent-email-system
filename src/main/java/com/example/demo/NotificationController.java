@@ -103,7 +103,6 @@ public class NotificationController {
     
     @GetMapping("/getNotificationSubjects")
     public ResponseEntity<List<String>> getNotificationSubjects(@RequestParam String notificationType) {
-        System.out.println(notificationType);
         List<Notification> notifications = notificationRepoCall.findAll();
         List<String> subjects = new ArrayList<>();
         for (Notification notification : notifications) {
@@ -120,11 +119,7 @@ public class NotificationController {
     @GetMapping("/getNotificationContent")
     public ResponseEntity<String> getNotificationContent(@RequestParam String notificationType, @RequestParam String notificationSubject) {
         List<Notification> notifications = notificationRepoCall.findAll();
-        System.out.println(notifications);
         for (Notification notification : notifications) {
-        	System.out.println(notification.getNotificationSubject());
-        	System.out.println(notification.getNotificationType());
-        	System.out.println(notification.getNotificationContent());
             if (notification.getNotificationType().equals(notificationType) &&
                 notification.getNotificationSubject().equals(notificationSubject)) {
             	System.out.println(notification.getNotificationContent());
@@ -141,15 +136,14 @@ public class NotificationController {
         query.addCriteria(Criteria.where("receiveNotifications").is(true)
                                  .and("notifications." + notificationType).is(true)
                                  .and("id").nin(notification.getUserList()));
-
         List<User> eligibleUsers = mongoTemplate.find(query, User.class);
-        //System.out.println(eligibleUsers);
+        System.out.println(eligibleUsers);
         String id = notification.getNotificationId();
         for (User user : eligibleUsers) {
             String email = user.getEmail();
-            String topic = notificationType.replaceAll("\\s+", "-").toLowerCase() + "-topic";
+            String topic = notificationType+ "-topic";
             String info = email+"%"+id;
-            kafkaproducer.sendNotificationMessage(topic,info);
+            kafkaproducer.sendMessage(topic,info);
             notification.getUserList().add(user.getId());
         }
 
