@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.demo.user;
 
 public class UserExistsResponse {
     private boolean exists;

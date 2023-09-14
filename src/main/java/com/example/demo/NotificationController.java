@@ -1,8 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.User;
-import com.example.demo.UserRepository;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,11 +15,17 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.user.User;
+import com.example.demo.repo.NotificationRepository;
+import com.example.demo.repo.UserRepository;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @RestController
@@ -43,76 +47,94 @@ public class NotificationController {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-	/*
-	 * @GetMapping("/promotions")
-	 * 
-	 * @ResponseBody public String sendPromotionsEmail() {
-	 * sendNotificationEmail("promotions","Promotion subject", "promotions code 1");
-	 * return "Promotions emails sent!"; }
-	 * 
-	 * @GetMapping("/latestplans")
-	 * 
-	 * @ResponseBody public String sendLatestPlansEmail() {
-	 * sendNotificationEmail("latestPlans","LatestPlan subject",
-	 * "Check out our latest plans!"); return "Latest plans emails sent!"; }
-	 * 
-	 * @GetMapping("/releaseevents")
-	 * 
-	 * @ResponseBody public String sendReleaseEventsEmail() {
-	 * sendNotificationEmail("releaseEvents","release eveny subject",
-	 * "New release events are here!"); return "Release events emails sent!"; }
-	 */
     
-    
-    @PostMapping("/NewNotification")
-    public void createNewNotification(@RequestBody Notification notification) {
-			String id=notification.getNotificationId();
-    		String topic=notification.getNotificationType();
-			String subject= notification.getNotificationSubject();
-			String message= notification.getNotificationContent();
-			
-			if(notificationRepoCall.existsByNotificationId(id))
-			{
-				Notification existnotification = notificationRepoCall.findById(id).orElse(null);
-				sendNotificationEmail(topic,subject,message,existnotification);
-			}
-			
-			else
-			{
-				notificationRepoCall.save(notification);
-				sendNotificationEmail(topic,subject,message,notification);
-				
-			}
+    @PostMapping("/createNotification")
+    public ResponseEntity<String> createNewNotification(@RequestBody Notification notification) {
+        // Check if a notification with the same subject exists for the given type
+        if (notificationRepoCall.existsByNotificationTypeAndNotificationSubject(notification.getNotificationType(), notification.getNotificationSubject())) {
+            return ResponseEntity.badRequest().body("Sorry, the message of type '" + notification.getNotificationType() + "' with the subject '" + notification.getNotificationSubject() + "' has already been created.");
+        }
+
+        // Save the notification (MongoDB will generate the _id)
+        notificationRepoCall.save(notification);
+
+        return ResponseEntity.ok("Notification created and saved successfully.");
     }
+    
+    @PostMapping("/sendNotification")
+    public ResponseEntity<String> sendNotification(@RequestBody Map<String, String> requestMap) {
+        String notificationType = requestMap.get("notificationType");
+        String notificationSubject = requestMap.get("notificationSubject");
+        Notification notification = notificationRepoCall.findByNotificationTypeAndNotificationSubject(notificationType, notificationSubject);
 
-      
-    @PatchMapping("/updateuser")
-    @ResponseBody
-    public ResponseEntity<String> updateUserPreferences(@RequestBody Map<String, String> requestMap) {
+        if (notification == null) {
+            return ResponseEntity.badRequest().body("Notification not found.");
+        }
+
+        // Send the notification email
+        sendNotificationEmail(notification.getNotificationType(), notification.getNotificationSubject(), notification.getNotificationContent(), notification);
+
+        return ResponseEntity.ok("Notification sent successfully.");
+    }
+     
+    @PutMapping("/updateNotification")
+    public ResponseEntity<String> updateNotification(@RequestBody Notification updatedNotification) {
+        // Check if a notification with the same type and subject exists
+        Notification existingNotification = notificationRepoCall.findByNotificationTypeAndNotificationSubject(
+                updatedNotification.getNotificationType(), updatedNotification.getNotificationSubject());
+
+        if (existingNotification == null) {
+        	return ResponseEntity.ok("Notification with type "+updatedNotification.getNotificationType()+ " and with subject "+updatedNotification.getNotificationSubject() +" doent exist.");
+        }
+
         try {
-            String email = requestMap.get("email");
-            boolean promotions = Boolean.parseBoolean(requestMap.get("promotions"));
-            boolean latestPlans = Boolean.parseBoolean(requestMap.get("latest plans"));
-            boolean releaseEvents = Boolean.parseBoolean(requestMap.get("release events"));
+            // Update the existing notification with the new content
+            existingNotification.setNotificationContent(updatedNotification.getNotificationContent());
+            // You can update other fields as needed
 
-            User existingUser = userRepository.findByEmail(email);
+            // Save the updated notification
+            notificationRepoCall.save(existingNotification);
 
-            if (existingUser != null) {
-                existingUser.getNotifications().put("promotions", promotions);
-                existingUser.getNotifications().put("latest plans", latestPlans);
-                existingUser.getNotifications().put("release events", releaseEvents);
-
-                userRepository.save(existingUser);
-
-                return ResponseEntity.ok("User preferences updated successfully");
-            } else {
-            	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-            }
+            return ResponseEntity.ok("Notification updated successfully.");
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().body("An error occurred");
+            return ResponseEntity.badRequest().body("Error updating notification: " + e.getMessage());
         }
     }
+    
+    @GetMapping("/getNotificationSubjects")
+    public ResponseEntity<List<String>> getNotificationSubjects(@RequestParam String notificationType) {
+        System.out.println(notificationType);
+        List<Notification> notifications = notificationRepoCall.findAll();
+        List<String> subjects = new ArrayList<>();
+        for (Notification notification : notifications) {
+            if (notification.getNotificationType().equals(notificationType)) {
+                subjects.add(notification.getNotificationSubject());
+            }
+        }
+        System.out.println(subjects);
+
+        // Create a ResponseEntity and set the list of subjects as the response body
+        return ResponseEntity.ok(subjects);
+    }
+    
+    @GetMapping("/getNotificationContent")
+    public ResponseEntity<String> getNotificationContent(@RequestParam String notificationType, @RequestParam String notificationSubject) {
+        List<Notification> notifications = notificationRepoCall.findAll();
+        System.out.println(notifications);
+        for (Notification notification : notifications) {
+        	System.out.println(notification.getNotificationSubject());
+        	System.out.println(notification.getNotificationType());
+        	System.out.println(notification.getNotificationContent());
+            if (notification.getNotificationType().equals(notificationType) &&
+                notification.getNotificationSubject().equals(notificationSubject)) {
+            	System.out.println(notification.getNotificationContent());
+                return ResponseEntity.ok(notification.getNotificationContent());
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+      
 
     private void sendNotificationEmail(String notificationType, String subject, String message, Notification notification) {
         Query query = new Query();
@@ -122,12 +144,12 @@ public class NotificationController {
 
         List<User> eligibleUsers = mongoTemplate.find(query, User.class);
         //System.out.println(eligibleUsers);
+        String id = notification.getNotificationId();
         for (User user : eligibleUsers) {
-            String name = user.getName();
             String email = user.getEmail();
             String topic = notificationType.replaceAll("\\s+", "-").toLowerCase() + "-topic";
-            kafkaproducer.sendMessage(name, email, topic, message, subject);
-            kafkaTemplate.send(topic, message);
+            String info = email+"%"+id;
+            kafkaproducer.sendNotificationMessage(topic,info);
             notification.getUserList().add(user.getId());
         }
 

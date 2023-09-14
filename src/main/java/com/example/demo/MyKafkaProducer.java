@@ -1,55 +1,56 @@
 package com.example.demo;
 
-import org.apache.kafka.clients.producer.*;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import java.util.Properties;
-import java.util.concurrent.CompletableFuture;
 
+import com.example.demo.user.MyUserConsumer;
+
+import org.springframework.kafka.support.SendResult;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Component
 public class MyKafkaProducer {
+    
+	private final KafkaTemplate<String, String> kafkaTemplate;
 
+    @Autowired
+    public MyKafkaProducer(KafkaTemplate<String, String> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
-    public CompletableFuture<Void> sendMessage(String name, String email, String topic, String message, String subject) {
-        return CompletableFuture.runAsync(() -> {
-            // Create a Kafka producer configuration
-            Properties producerProps = new Properties();
-            producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-            producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-            producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+    public CompletableFuture<Void> sendMessage(String topic, String email) {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, email);
 
-            // Create a Kafka producer instance
-            Producer<String, String> producer = new KafkaProducer<>(producerProps);
-
+        return CompletableFuture.supplyAsync(() -> {
             try {
-               
-
-                // Create a Kafka producer record
-                ProducerRecord<String, String> record = new ProducerRecord<>(topic, message);
-
-                // Send the message to the Kafka topic
-                producer.send(record, new Callback() {
-                    @Override
-                    public void onCompletion(RecordMetadata metadata, Exception exception) {
-                        if (exception == null) {
-                            System.out.println("Message sent successfully to topic: " + metadata.topic());
-                            
-                            // After sending the Kafka message, send an email
-                           
-                           
-                            EmailSender.sendEmail(email, subject, message);
-                        } else {
-                            System.err.println("Error sending message: " + exception.getMessage());
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                producer.close();
+                SendResult<String, String> sendResult = kafkaTemplate.send(record).get();
+                System.out.println("Message sent successfully to topic: " + sendResult.getRecordMetadata().topic());
+                return null;
+            } catch (InterruptedException | ExecutionException ex) {
+                System.err.println("Error sending message: " + ex.getMessage());
+                throw new RuntimeException(ex); // Propagate the exception
             }
         });
     }
+    
+    public CompletableFuture<Void> sendNotificationMessage(String topic, String info) {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic,info);
 
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                SendResult<String,String> sendResult = kafkaTemplate.send(record).get();
+                System.out.println("Message sent successfully to topic: " + sendResult.getRecordMetadata().topic());
+                return null;
+            } catch (InterruptedException | ExecutionException ex) {
+                System.err.println("Error sending message: " + ex.getMessage());
+                throw new RuntimeException(ex); // Propagate the exception
+            }
+        });
+    }
 
 }

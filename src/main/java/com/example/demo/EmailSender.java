@@ -6,9 +6,8 @@ import java.util.Properties;
 
 public class EmailSender {
     public static void sendEmail(String recipient, String subject, String content) {
-    	final String senderEmail = "notificationsystem03@gmail.com";  // Your Gmail address
-        final String senderPassword = "tgqfhjwyjwfhdmvn"; // Your Gmail password or app-specific password
-
+    	final String senderEmail = "notificationsystem03@gmail.com";  
+        final String senderPassword = "tgqfhjwyjwfhdmvn"; 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -27,7 +26,7 @@ public class EmailSender {
             message.setFrom(new InternetAddress(senderEmail));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
             message.setSubject(subject);
-            message.setText(content);
+            message.setContent(content, "text/html");
 
             Transport.send(message);
 
