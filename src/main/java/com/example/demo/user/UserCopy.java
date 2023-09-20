@@ -1,33 +1,39 @@
 package com.example.demo.user;
+
+
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
-@Document(collection = "users")
-public class User {
+@Document(collection = "user_copies")
+public class UserCopy {
 
     @Id
     private String id;
-
-    @Indexed(unique = true)
     private String name;
     private String email;
     private boolean receiveNotifications;
     private Map<String, Boolean> notifications;
-    private Map<String, String> receivedNotifications; // Store received notifications as formatted strings
+    private Map<String, String> receivedNotifications;
 
-    public User() {
-        this.id = UUID.randomUUID().toString();
+    // Constructors, getters, and setters
+
+    public UserCopy() {
+        // Default constructor
         this.notifications = new HashMap<>();
         this.receivedNotifications = new HashMap<>();
     }
 
+    // Getters and setters
+
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -69,16 +75,5 @@ public class User {
     public void setReceivedNotifications(Map<String, String> receivedNotifications) {
         this.receivedNotifications = receivedNotifications;
     }
-
-    public void logReceivedNotification(String notificationId, String formattedTimestamp) {
-        receivedNotifications.put(notificationId, formattedTimestamp);
-    }
-
-    public boolean hasReceivedNotification(String notificationId) {
-        return receivedNotifications.containsKey(notificationId);
-    }
-
-    public String getReceivedNotificationTimestamp(String notificationId) {
-        return receivedNotifications.get(notificationId);
-    }
 }
+

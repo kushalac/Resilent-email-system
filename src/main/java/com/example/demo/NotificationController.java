@@ -1,6 +1,8 @@
 package com.example.demo;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.user.User;
+import com.example.demo.repo.NotificationCopyRepository;
 import com.example.demo.repo.NotificationRepository;
 import com.example.demo.repo.UserRepository;
 
@@ -43,6 +46,10 @@ public class NotificationController {
     
     @Autowired
     private  NotificationRepository notificationRepoCall;
+    
+    @Autowired
+    private NotificationCopyRepository notificationCopyRepoCall;
+
     
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -129,26 +136,65 @@ public class NotificationController {
 
         return ResponseEntity.notFound().build();
     }
-      
+    
+    @DeleteMapping("/deleteNotification")
+    public ResponseEntity<String> deleteNotification(
+            @RequestParam String notificationType,
+            @RequestParam String notificationSubject) {
+        // Find the notification to delete based on type and subject
+        Notification notificationToDelete = notificationRepoCall.findByNotificationTypeAndNotificationSubject(
+                notificationType, notificationSubject);
 
-    private void sendNotificationEmail(String notificationType, String subject, String message, Notification notification) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("receiveNotifications").is(true)
-                                 .and("notifications." + notificationType).is(true)
-                                 .and("id").nin(notification.getUserList()));
-        List<User> eligibleUsers = mongoTemplate.find(query, User.class);
-        System.out.println(eligibleUsers);
-        String id = notification.getNotificationId();
-        for (User user : eligibleUsers) {
-            String email = user.getEmail();
-            String topic = notificationType+ "-topic";
-            String info = email+"%"+id;
-            kafkaproducer.sendMessage(topic,info);
-            notification.getUserList().add(user.getId());
+        if (notificationToDelete == null) {
+            return ResponseEntity.ok("Notification not found.");
         }
 
-        
-        notificationRepoCall.save(notification);
+        try {
+            // Create a copy of the notification with the deletion timestamp
+            NotificationCopy deletedNotificationCopy = new NotificationCopy();
+            deletedNotificationCopy.setNotificationType(notificationToDelete.getNotificationType());
+            deletedNotificationCopy.setNotificationSubject(notificationToDelete.getNotificationSubject());
+            deletedNotificationCopy.setNotificationContent(notificationToDelete.getNotificationContent());
+            deletedNotificationCopy.setUserList(notificationToDelete.getUserList());
+
+            // Save the copy to the "notification_copies" collection
+            notificationCopyRepoCall.save(deletedNotificationCopy);
+            // Delete the notification
+            notificationRepoCall.delete(notificationToDelete);
+            return ResponseEntity.ok("Notification deleted successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error deleting notification: " + e.getMessage());
+        }
     }
 
+      
+
+private void sendNotificationEmail(String notificationType, String subject, String message, Notification notification) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where("receiveNotifications").is(true)
+                             .and("notifications." + notificationType).is(true)
+                             .and("id").nin(notification.getUserList()));
+    List<User> eligibleUsers = mongoTemplate.find(query, User.class);
+    System.out.println(eligibleUsers);
+    String id = notification.getNotificationId();
+    for (User user : eligibleUsers) {
+    
+         long timestamp = System.currentTimeMillis();
+      // Convert the timestamp to a human-readable date and time format
+         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+         String formattedTimestamp = sdf.format(new Date(timestamp));
+         user.logReceivedNotification(id, formattedTimestamp);
+         userRepository.save(user); // Save the updated user entity
+
+        String email = user.getEmail();
+        String topic = notificationType+ "-topic";
+        String info = email+"%"+id;
+        kafkaproducer.sendMessage(topic,info);
+        notification.getUserList().add(user.getId());
     }
+
+    
+    notificationRepoCall.save(notification);
+}
+
+}

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.EmailSender;
 import com.example.demo.MyKafkaProducer;
+import com.example.demo.repo.UserCopyRepository;
 import com.example.demo.repo.UserRepository;
 
 import java.util.Collections;
@@ -19,6 +20,9 @@ public class DeleteUserController {
 
     @Autowired
     private UserRepository userRepoCall;
+    
+    @Autowired
+    private UserCopyRepository userCopyRepo;
 
     @Autowired
     private MyKafkaProducer kafkaproducer;
@@ -71,15 +75,24 @@ public class DeleteUserController {
             User userToDelete = userRepoCall.findByEmail(email);
 
             if (userToDelete != null) {
+                // Create a copy of the user data to store in another database
+                UserCopy userCopy = new UserCopy();
+                userCopy.setId(userToDelete.getId());
+                userCopy.setName(userToDelete.getName());
+                userCopy.setEmail(userToDelete.getEmail());
+                userCopy.setReceiveNotifications(userToDelete.isReceiveNotifications());
+                userCopy.setNotifications(userToDelete.getNotifications());
+                userCopy.setReceivedNotifications(userToDelete.getReceivedNotifications());
+
+                // Save the copy of user data in another database (e.g., MongoDB)
+                userCopyRepo.save(userCopy);
                
                 // Send a notification to the user about account deletion
                 String topic = "account-deleted-topic";
 
                 kafkaproducer.sendMessage(topic,email);
-                // Remove the confirmation token
-                userRepoCall.delete(userToDelete);
                 
-                // Delete the user from the database
+                // Remove the confirmation token
                 tokenService.removeToken(token);
 
                 return ResponseEntity.status(HttpStatus.OK).body("Account deleted successfully");

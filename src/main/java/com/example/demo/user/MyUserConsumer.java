@@ -58,10 +58,11 @@ public class MyUserConsumer {
         if (user != null) {
             String subject = "Account Deleted";
             int eventCode=2;
+            userRepoCall.delete(user);
             String emailContent= userEmailGenerator.generateUserEmailContent(user,eventCode);
             EmailSender.sendEmail(user.getEmail(), subject, emailContent);
         } else {
-            // Handle the case when the user is not found
+           
             System.out.println("User not found for email: " + email);
         }
     }
@@ -84,7 +85,7 @@ public class MyUserConsumer {
             String emailContent= userEmailGenerator.generateUserEmailContentDeletion(user,content);
             EmailSender.sendEmail(email, subject, emailContent);
         } else {
-            // Handle the case when the user is not found
+           
             System.out.println("User not found for email: " + email);
         }
         }
