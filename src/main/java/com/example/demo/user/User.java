@@ -1,4 +1,5 @@
 package com.example.demo.user;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -19,11 +20,13 @@ public class User {
     private boolean receiveNotifications;
     private Map<String, Boolean> notifications;
     private Map<String, String> receivedNotifications; // Store received notifications as formatted strings
+    private boolean active; // New "active" field
 
     public User() {
         this.id = UUID.randomUUID().toString();
         this.notifications = new HashMap<>();
         this.receivedNotifications = new HashMap<>();
+        this.active = true; // Set the "active" field to true by default during signup
     }
 
     public String getId() {
@@ -80,5 +83,13 @@ public class User {
 
     public String getReceivedNotificationTimestamp(String notificationId) {
         return receivedNotifications.get(notificationId);
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

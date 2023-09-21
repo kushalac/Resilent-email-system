@@ -6,23 +6,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import com.example.demo.EmailSender;
 import com.example.demo.MyKafkaProducer;
-import com.example.demo.repo.UserCopyRepository;
 import com.example.demo.repo.UserRepository;
 
 import java.util.Collections;
 import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @Controller
 public class DeleteUserController {
 
     @Autowired
     private UserRepository userRepoCall;
-    
-    @Autowired
-    private UserCopyRepository userCopyRepo;
+
 
     @Autowired
     private MyKafkaProducer kafkaproducer;
@@ -41,12 +37,21 @@ public class DeleteUserController {
             }
 
             User userToDelete = userRepoCall.findByEmail(email);
-            
 
             if (userToDelete == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Collections.singletonMap("message", "User with email " + email + " not found"));
             }
+
+            if (!userToDelete.isActive()) {
+                // If the user is inactive, consider them as "not found"
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("message", "User with email " + email + " not found"));
+            }
+
+            // Set the "active" field to false when deleting the user
+            userToDelete.setActive(false);
+            userRepoCall.save(userToDelete);
 
             // Generate a confirmation token
             String confirmationToken = tokenService.generateToken(email);
@@ -54,10 +59,8 @@ public class DeleteUserController {
             // Send a confirmation email to the user with the token
 
             String topic = "deleteConfirmation-topic";
-            String info=email+"%"+
-                    getConfirmationLink(confirmationToken);
+            String info = email + "%" + getConfirmationLink(confirmationToken);
             kafkaproducer.sendMessage(topic, info);
-            
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(Collections.singletonMap("message", "Confirmation email sent to " + email));
@@ -68,6 +71,8 @@ public class DeleteUserController {
         }
     }
 
+
+
     @GetMapping("/confirmDelete/{token}")
     public ResponseEntity<String> confirmDelete(@PathVariable String token) {
         if (tokenService.isValidToken(token)) {
@@ -75,17 +80,6 @@ public class DeleteUserController {
             User userToDelete = userRepoCall.findByEmail(email);
 
             if (userToDelete != null) {
-                // Create a copy of the user data to store in another database
-                UserCopy userCopy = new UserCopy();
-                userCopy.setId(userToDelete.getId());
-                userCopy.setName(userToDelete.getName());
-                userCopy.setEmail(userToDelete.getEmail());
-                userCopy.setReceiveNotifications(userToDelete.isReceiveNotifications());
-                userCopy.setNotifications(userToDelete.getNotifications());
-                userCopy.setReceivedNotifications(userToDelete.getReceivedNotifications());
-
-                // Save the copy of user data in another database (e.g., MongoDB)
-                userCopyRepo.save(userCopy);
                
                 // Send a notification to the user about account deletion
                 String topic = "account-deleted-topic";

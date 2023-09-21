@@ -1,7 +1,5 @@
 package com.example.demo.user;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -58,7 +56,7 @@ public class MyUserConsumer {
         if (user != null) {
             String subject = "Account Deleted";
             int eventCode=2;
-            userRepoCall.delete(user);
+            //userRepoCall.delete(user);
             String emailContent= userEmailGenerator.generateUserEmailContent(user,eventCode);
             EmailSender.sendEmail(user.getEmail(), subject, emailContent);
         } else {

@@ -9,37 +9,28 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.demo.user.User;
-import com.example.demo.repo.NotificationCopyRepository;
 import com.example.demo.repo.NotificationRepository;
 import com.example.demo.repo.UserRepository;
-
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/notification")
 public class NotificationController {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
     
     @Autowired
     private MyKafkaProducer kafkaproducer;
@@ -48,25 +39,33 @@ public class NotificationController {
     private  NotificationRepository notificationRepoCall;
     
     @Autowired
-    private NotificationCopyRepository notificationCopyRepoCall;
-
-    
-    @Autowired
     private MongoTemplate mongoTemplate;
 
     
     @PostMapping("/createNotification")
     public ResponseEntity<String> createNewNotification(@RequestBody Notification notification) {
-        // Check if a notification with the same subject exists for the given type
-        if (notificationRepoCall.existsByNotificationTypeAndNotificationSubject(notification.getNotificationType(), notification.getNotificationSubject())) {
-            return ResponseEntity.badRequest().body("Sorry, the message of type '" + notification.getNotificationType() + "' with the subject '" + notification.getNotificationSubject() + "' has already been created.");
+        Notification existingNotification = notificationRepoCall.findByNotificationTypeAndNotificationSubject(
+                notification.getNotificationType(), notification.getNotificationSubject());
+
+        if (existingNotification != null) {
+            if (existingNotification.isActiveNotification()) {
+                // If an active notification with the same type and subject exists, return a response indicating that
+                return ResponseEntity.badRequest().body("Notification with type '" + notification.getNotificationType() +
+                        "' and subject '" + notification.getNotificationSubject() + "' already exists.");
+            } else {
+                // If an inactive notification with the same type and subject exists, update it
+                existingNotification.setNotificationContent(notification.getNotificationContent());
+                existingNotification.setActiveNotification(true);
+                notificationRepoCall.save(existingNotification);
+                return ResponseEntity.ok("Notification created successfully.");
+            }
         }
 
         // Save the notification (MongoDB will generate the _id)
         notificationRepoCall.save(notification);
-
         return ResponseEntity.ok("Notification created and saved successfully.");
     }
+
     
     @PostMapping("/sendNotification")
     public ResponseEntity<String> sendNotification(@RequestBody Map<String, String> requestMap) {
@@ -74,8 +73,8 @@ public class NotificationController {
         String notificationSubject = requestMap.get("notificationSubject");
         Notification notification = notificationRepoCall.findByNotificationTypeAndNotificationSubject(notificationType, notificationSubject);
 
-        if (notification == null) {
-            return ResponseEntity.badRequest().body("Notification not found.");
+        if (notification == null || !notification.isActiveNotification()) {
+            return ResponseEntity.badRequest().body("Notification not found");
         }
 
         // Send the notification email
@@ -110,33 +109,35 @@ public class NotificationController {
     
     @GetMapping("/getNotificationSubjects")
     public ResponseEntity<List<String>> getNotificationSubjects(@RequestParam String notificationType) {
-        List<Notification> notifications = notificationRepoCall.findAll();
+        List<Notification> allNotifications = notificationRepoCall.findAll();
         List<String> subjects = new ArrayList<>();
-        for (Notification notification : notifications) {
-            if (notification.getNotificationType().equals(notificationType)) {
+        
+        for (Notification notification : allNotifications) {
+            if (notification.getNotificationType().equals(notificationType) && notification.isActiveNotification()) {
                 subjects.add(notification.getNotificationSubject());
             }
         }
-        System.out.println(subjects);
-
+        
+        if (subjects.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
         // Create a ResponseEntity and set the list of subjects as the response body
         return ResponseEntity.ok(subjects);
     }
-    
+
+
     @GetMapping("/getNotificationContent")
     public ResponseEntity<String> getNotificationContent(@RequestParam String notificationType, @RequestParam String notificationSubject) {
-        List<Notification> notifications = notificationRepoCall.findAll();
-        for (Notification notification : notifications) {
-            if (notification.getNotificationType().equals(notificationType) &&
-                notification.getNotificationSubject().equals(notificationSubject)) {
-            	System.out.println(notification.getNotificationContent());
-                return ResponseEntity.ok(notification.getNotificationContent());
-            }
+        Notification notification = notificationRepoCall.findByNotificationTypeAndNotificationSubject(notificationType, notificationSubject);
+
+        if (notification != null && notification.isActiveNotification()) {
+            return ResponseEntity.ok(notification.getNotificationContent());
         }
 
         return ResponseEntity.notFound().build();
     }
-    
+
     @DeleteMapping("/deleteNotification")
     public ResponseEntity<String> deleteNotification(
             @RequestParam String notificationType,
@@ -150,20 +151,12 @@ public class NotificationController {
         }
 
         try {
-            // Create a copy of the notification with the deletion timestamp
-            NotificationCopy deletedNotificationCopy = new NotificationCopy();
-            deletedNotificationCopy.setNotificationType(notificationToDelete.getNotificationType());
-            deletedNotificationCopy.setNotificationSubject(notificationToDelete.getNotificationSubject());
-            deletedNotificationCopy.setNotificationContent(notificationToDelete.getNotificationContent());
-            deletedNotificationCopy.setUserList(notificationToDelete.getUserList());
-
-            // Save the copy to the "notification_copies" collection
-            notificationCopyRepoCall.save(deletedNotificationCopy);
-            // Delete the notification
-            notificationRepoCall.delete(notificationToDelete);
-            return ResponseEntity.ok("Notification deleted successfully.");
+            // Set activeNotification to false instead of deleting
+            notificationToDelete.setActiveNotification(false);
+            notificationRepoCall.save(notificationToDelete);
+            return ResponseEntity.ok("Notification deactivated successfully.");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting notification: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error deactivating notification: " + e.getMessage());
         }
     }
 
@@ -173,6 +166,7 @@ private void sendNotificationEmail(String notificationType, String subject, Stri
     Query query = new Query();
     query.addCriteria(Criteria.where("receiveNotifications").is(true)
                              .and("notifications." + notificationType).is(true)
+                             .and("active").is(true)
                              .and("id").nin(notification.getUserList()));
     List<User> eligibleUsers = mongoTemplate.find(query, User.class);
     System.out.println(eligibleUsers);

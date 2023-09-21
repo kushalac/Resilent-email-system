@@ -15,10 +15,12 @@ public class Notification {
 	    public String notificationSubject;
 	    public String notificationContent;
 	    public List<String> userList;
+	    public boolean activeNotification;
 	    
 	    public Notification() {
 	        this.notificationId = UUID.randomUUID().toString();
 	        this.userList = new ArrayList<>();
+	        this.activeNotification = true; 
 	    }
 
 		public String getNotificationId() {
@@ -60,5 +62,13 @@ public class Notification {
 		public void setUserList(List<String> userList) {
 			this.userList = userList;
 		}
+		
+	    public boolean isActiveNotification() {
+	        return activeNotification;
+	    }
+
+	    public void setActiveNotification(boolean activeNotification) {
+	        this.activeNotification = activeNotification;
+	    }
 	   
 }

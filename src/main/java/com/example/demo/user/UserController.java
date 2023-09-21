@@ -1,30 +1,21 @@
 package com.example.demo.user;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.example.demo.MyKafkaProducer;
 import com.example.demo.repo.UserRepository;
-import com.mongodb.DuplicateKeyException;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class UserController {
 
@@ -50,14 +41,21 @@ public class UserController {
             }
 
             User existingUser = userRepoCall.findByEmail(user.getEmail());
-            if (existingUser != null) {
+            if (existingUser != null && !existingUser.isActive()) {
+                // If the user exists but is not active, it's considered a new signup
+                userRepoCall.delete(existingUser); // Remove the existing inactive user
+            } else if (existingUser != null && existingUser.isActive()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Email already exists"));
             }
+
+            user.setActive(true); // Set the user as active
             userRepoCall.save(user);
+            
             if (receiveNotifications) {
                 String topic = "signup-topic";
-                kafkaproducer.sendMessage(topic,email);
+                kafkaproducer.sendMessage(topic, email);
             }
+            
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User created successfully"));
         } catch (Exception e) {
             // Handle the exception, log it, and return an error response
@@ -65,16 +63,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An error occurred"));
         }
     }
-    
-    
+
     @PutMapping("/userUpdate")
     public ResponseEntity<String> updateUserByEmail(@RequestBody User updatedUser) {
         try {
-            // Check if the user exists
+            // Check if the user exists and is active
             String userEmail = updatedUser.getEmail();
             User existingUser = userRepoCall.findByEmail(userEmail);
 
-            if (existingUser != null) {
+            if (existingUser != null && existingUser.isActive()) {
                 // Update user information based on modifications
                 existingUser.setName(updatedUser.getName());
                 existingUser.setReceiveNotifications(updatedUser.isReceiveNotifications());
@@ -84,10 +81,11 @@ public class UserController {
                 userRepoCall.save(existingUser);
 
                 String topic = "account-modified-topic";
- 
-                kafkaproducer.sendMessage(topic,userEmail);
-                
+                kafkaproducer.sendMessage(topic, userEmail);
+
                 return ResponseEntity.status(HttpStatus.OK).body("User updated successfully");
+            } else if (existingUser != null && !existingUser.isActive()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
@@ -96,7 +94,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred updating");
         }
     }
-
     
     @PostMapping("/userExists")
     public ResponseEntity<UserExistsResponse> checkUserExists(@RequestBody UserExistsRequest request) {
@@ -104,7 +101,7 @@ public class UserController {
             String userEmail = request.getEmail();
             User existingUser = userRepoCall.findByEmail(userEmail);
 
-            if (existingUser != null) {
+            if (existingUser != null && existingUser.isActive()) {
                 UserExistsResponse response = new UserExistsResponse(true, existingUser);
                 return ResponseEntity.ok(response);
             } else {
