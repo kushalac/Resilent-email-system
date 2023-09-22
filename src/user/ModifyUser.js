@@ -54,6 +54,7 @@ class ModifyUser extends Component {
       .then((message) => {
         if (message === 'User updated successfully') {
           alert('User updated successfully');
+          window.location.href = '/SigninUser';
         } else {
           alert('An error occurred while updating the user.');
         }
@@ -175,27 +176,29 @@ class ModifyUser extends Component {
               {this.state.receiveNotifications && (
                 <div id="notificationOptions">
                   <label>Notification Preferences:</label>
-                  <input
-                    type="checkbox"
-                    id="promotions"
-                    checked={this.state.promotions}
-                    onChange={() => this.setState({ promotions: !this.state.promotions })}
-                  />
-                  Promotions
-                  <input
-                    type="checkbox"
-                    id="latestPlans"
-                    checked={this.state.latestPlans}
-                    onChange={() => this.setState({ latestPlans: !this.state.latestPlans })}
-                  />
-                  Latest Plans
-                  <input
-                    type="checkbox"
-                    id="releaseEvents"
-                    checked={this.state.releaseEvents}
-                    onChange={() => this.setState({ releaseEvents: !this.state.releaseEvents })}
-                  />
-                  Release Events
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type="checkbox"
+                      id="promotions"
+                      checked={this.state.promotions}
+                      onChange={() => this.setState({ promotions: !this.state.promotions })}
+                    />
+                    <label htmlFor="promotions" style={{ marginLeft: '5px', marginRight: '5px', marginBottom: '0' }}>Promotions</label>
+                    <input
+                      type="checkbox"
+                      id="latestPlans"
+                      checked={this.state.latestPlans}
+                      onChange={() => this.setState({ latestPlans: !this.state.latestPlans })}
+                    />
+                    <label htmlFor="latestPlans" style={{ marginLeft: '5px', marginRight: '5px', marginBottom: '0' }}>Latest Plans</label>
+                    <input
+                      type="checkbox"
+                      id="releaseEvents"
+                      checked={this.state.releaseEvents}
+                      onChange={() => this.setState({ releaseEvents: !this.state.releaseEvents })}
+                    />
+                    <label htmlFor="releaseEvents" style={{ marginLeft: '5px', marginBottom: '0' }}>Release Events</label>
+                  </div>
                 </div>
               )}
               <br />

@@ -17,12 +17,12 @@ function DeleteUser() {
         return response.json();
       })
       .then((data) => {
-        console.log('Response data:', data);
-
         if (data.message) {
           alert(data.message); // Display the server response message
+          window.location.href = '/user';
         } else {
           alert('User deleted successfully');
+          // Redirect to the signup page after successful deletion
         }
       })
       .catch((error) => {
@@ -31,29 +31,28 @@ function DeleteUser() {
       });
   };
 
-
   return (
-	  <div class="container">
-    <div className="delete-container">
-      <h1>Delete User</h1>
-      <form id="delete-form">
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="Enter user's email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <button type="button" onClick={deleteUser} className="signup-button">
-          Delete User
-        </button>
-      </form>
-    </div>
+    <div className="container">
+      <div className="delete-container">
+        <h1>Delete User</h1>
+        <form id="delete-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter user's email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <button type="button" onClick={deleteUser} className="signup-button">
+            Delete User
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
