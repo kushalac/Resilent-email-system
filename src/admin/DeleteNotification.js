@@ -38,15 +38,24 @@ const DeleteNotification = () => {
         'Content-Type': 'application/json',
       },
     })
-      .then((response) => {
-        if (response.ok) {
-          alert('Notification deleted successfully.');
-          // Optionally, you can reset the selectedSubject
-          setSelectedSubject('');
-        } else {
-          alert('Error deleting notification.');
-        }
-      });
+    .then((response) => {
+      if (response.ok) {
+        // Optionally, you can reset the selectedSubject
+        setSelectedSubject('');
+        alert('Notification deleted successfully.');
+      } else {
+        return response.json(); // Parse the response body as JSON
+      }
+    })
+    .then((errorData) => {
+      if (errorData) {
+        alert(`Error deleting notification: ${errorData.message}`);
+      }
+    })
+    .catch((error) => {
+      console.error('Error deleting notification:', error);
+      alert('An error occurred while deleting the notification.');
+    });
   };
 
   // Fetch initial notification subjects when notificationType changes

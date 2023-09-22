@@ -140,9 +140,11 @@ class ModifyUser extends Component {
               value={this.state.email}
               onChange={(e) => this.setState({ email: e.target.value })}
             />
+          <div className="center-button">
             <button onClick={this.checkUser} className="signup-button button-spacing">
               Check User
             </button>
+          </div>
           </div>
 
           {this.state.userDataVisible && (
@@ -197,9 +199,11 @@ class ModifyUser extends Component {
                 </div>
               )}
               <br />
+              <div className="center-button">
               <button onClick={this.updateUser} className="signup-button">
                 Update User
               </button>
+              </div>
             </div>
           )}
         </div>
