@@ -20,7 +20,8 @@ public class User {
     private boolean receiveNotifications;
     private Map<String, Boolean> notifications;
     private Map<String, String> receivedNotifications; // Store received notifications as formatted strings
-    private boolean active; // New "active" field
+    private boolean active; 
+    private String password;
 
 
     public User() {
@@ -92,5 +93,13 @@ public class User {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.user;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.MyKafkaProducer;
 import com.example.demo.repo.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -30,7 +32,7 @@ public class UserController {
         try {
             String name = user.getName();
             String email = user.getEmail();
-            boolean receiveNotifications = user.isReceiveNotifications();
+            String password = user.getPassword(); // Get the password from the User object
 
             if (name == null || name.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Name is missing or empty"));
@@ -48,14 +50,25 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Email already exists"));
             }
 
+            if (password == null || password.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Password is missing or empty"));
+            }
+
+            // Hash the password
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String hashedPassword = encoder.encode(password);
+            user.setPassword(hashedPassword);
+
             user.setActive(true); // Set the user as active
             userRepoCall.save(user);
-            
+
+            // Kafka message sending code (assuming kafkaproducer is correctly configured)
+            boolean receiveNotifications = user.isReceiveNotifications();
             if (receiveNotifications) {
                 String topic = "signup-topic";
                 kafkaproducer.sendMessage(topic, email);
             }
-            
+
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "User created successfully"));
         } catch (Exception e) {
             // Handle the exception, log it, and return an error response
@@ -63,7 +76,37 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "An error occurred"));
         }
     }
+    
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(); // Configure PasswordEncoder here
 
+    @PostMapping("/signin")
+    public ResponseEntity<String> signin(@RequestBody Map<String, String> signinRequest) {
+        try {
+            String email = signinRequest.get("email");
+            String password = signinRequest.get("password");
+
+            if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+                return ResponseEntity.badRequest().body("Please provide both email and password.");
+            }
+
+            User user = userRepoCall.findByEmail(email);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("User not found. Please check your credentials.");
+            }
+
+            // Use BCryptPasswordEncoder to verify the password
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                return ResponseEntity.badRequest().body("Incorrect password. Please try again.");
+            }
+
+            // Sign-in successful
+            return ResponseEntity.ok("Sign-in successful");
+        } catch (Exception e) {
+            // Handle the exception, log it, and return an error response
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+        }
+    }
     @PutMapping("/userUpdate")
     public ResponseEntity<String> updateUserByEmail(@RequestBody User updatedUser) {
         try {
