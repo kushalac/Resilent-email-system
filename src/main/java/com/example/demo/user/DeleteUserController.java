@@ -49,9 +49,6 @@ public class DeleteUserController {
                         .body(Collections.singletonMap("message", "User with email " + email + " not found"));
             }
 
-            // Set the "active" field to false when deleting the user
-            userToDelete.setActive(false);
-            userRepoCall.save(userToDelete);
 
             // Generate a confirmation token
             String confirmationToken = tokenService.generateToken(email);
@@ -80,6 +77,10 @@ public class DeleteUserController {
             User userToDelete = userRepoCall.findByEmail(email);
 
             if (userToDelete != null) {
+            	
+                // Set the "active" field to false when deleting the user
+                userToDelete.setActive(false);
+                userRepoCall.save(userToDelete);
                
                 // Send a notification to the user about account deletion
                 String topic = "account-deleted-topic";

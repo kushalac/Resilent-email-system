@@ -118,13 +118,10 @@ public class NotificationController {
             }
         }
         
-        if (subjects.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        // Create a ResponseEntity and set the list of subjects as the response body
+        // Always return a response with the subjects, even if it's an empty list
         return ResponseEntity.ok(subjects);
     }
+
 
 
     @GetMapping("/getNotificationContent")

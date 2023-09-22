@@ -22,6 +22,7 @@ public class User {
     private Map<String, String> receivedNotifications; // Store received notifications as formatted strings
     private boolean active; // New "active" field
 
+
     public User() {
         this.id = UUID.randomUUID().toString();
         this.notifications = new HashMap<>();
