@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus, faUserEdit, faTrash } from '@fortawesome/free-solid-svg-icons'; // Import relevant FontAwesome icons
+import { faUserPlus,faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 const User = () => {
   const navigate = useNavigate();
@@ -11,12 +11,8 @@ const User = () => {
     navigate('/Signup');
   };
 
-  const handleModifyUserClick = () => {
-    navigate('/ModifyUser');
-  };
-
-  const handleDeleteClick = () => {
-    navigate('/DeleteUser');
+  const handleSigninClick = () => {
+    navigate('/Signin');
   };
 
   return (
@@ -33,16 +29,9 @@ const User = () => {
             <span className="button-text">Signup</span>
           </button>
 
-          {/* User Modification Button */}
-          <button className="square-button" onClick={handleModifyUserClick}>
-            <FontAwesomeIcon icon={faUserEdit} />&nbsp;
-            <span className="button-text">User Modification</span>
-          </button>
-
-          {/* Delete Button */}
-          <button className="square-button" onClick={handleDeleteClick}>
-            <FontAwesomeIcon icon={faTrash} />&nbsp;
-            <span className="button-text">Delete</span>
+        <button className="square-button" onClick={handleSigninClick}>
+        <FontAwesomeIcon icon={faSignInAlt} />&nbsp;
+            <span className="button-text">Signin</span>
           </button>
         </div>
       </div>
@@ -51,3 +40,4 @@ const User = () => {
 };
 
 export default User;
+

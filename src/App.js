@@ -5,6 +5,8 @@ import User from './user/User';
 import ModifyUser from './user/ModifyUser';
 import DeleteUser from './user/DeleteUser';
 import Signup from './user/Signup';
+import Signin from './user/Signin';
+import SigninUser from './user/SigninUser';
 import Admin from './admin/Admin';
 import CreateNotification from './admin/CreateNotification';
 import UpdateNotification from './admin/UpdateNotification';
@@ -22,6 +24,8 @@ function App() {
         <Route path="/DeleteNotification" element={<DeleteNotification />} />
         <Route path="/User" element={<User />} />
         <Route path="/Signup" element={<Signup />} />
+        <Route path="/Signin" element={<Signin />} />
+        <Route path="/SigninUser" element={<SigninUser />} />
         <Route path="/ModifyUser" element={<ModifyUser />} />
         <Route path="/DeleteUser" element={<DeleteUser />} />
         <Route path="/" element={<Homepage />} />

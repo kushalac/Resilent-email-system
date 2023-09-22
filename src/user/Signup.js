@@ -6,6 +6,7 @@ function Signup() {
   const initialFormData = {
     name: '',
     email: '',
+    password: '', // New password field
     receiveNotifications: false,
     notifications: {
       promotions: false,
@@ -59,22 +60,25 @@ function Signup() {
       return;
     }
 
+    if (!formData.password) {
+      alert('Please enter your password.');
+      return;
+    }
+
     axios
-    .post('http://localhost:8080/signup', formData)
-    .then((response) => {
-      
-      if (response.status === 201) {
-        alert('User has been created successfully');
-        setFormData(initialFormData);
-      } else {
-        alert(response.data.message)
-      }
-    })
-    .catch((error) => {
-      console.error('Error:', error.response);
-      alert(error.response.data.message); // Display the specific error message
-      });
-  
+      .post('http://localhost:8080/signup', formData)
+      .then((response) => {
+        if (response.status === 201) {
+          alert('User has been created successfully');
+          setFormData(initialFormData);
+        } else {
+          alert(response.data.message);
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error.response);
+        alert(error.response.data.message);
+      });
   };
 
   return (
@@ -102,6 +106,18 @@ function Signup() {
               name="email"
               placeholder="Enter your email"
               value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              value={formData.password}
               onChange={handleChange}
               required
             />
@@ -170,7 +186,6 @@ function Signup() {
               />
             </div>
           </div>
-
           <button type="button" className="signup-button" onClick={handleFormSubmit}>
             Sign Up
           </button>
