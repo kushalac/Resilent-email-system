@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import '../css/Notification.css';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 function UpdateNotification() {
+  const navigate = useNavigate();
+  const { authenticated } = useAuth();
+
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
   const [notificationSubject, setNotificationSubject] = useState('');
   const [notificationContent, setNotificationContent] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Load subjects when notificationType changes or when component mounts
   useEffect(() => {
@@ -79,79 +85,92 @@ function UpdateNotification() {
     }
 
     // Make an AJAX request to update the notification
-    fetch('http://localhost:8080/notification/updateNotification', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    axios
+      .put('http://localhost:8080/notification/updateNotification', {
         notificationType,
         notificationSubject,
         notificationContent,
-      }),
-    })
+      })
       .then((response) => {
-        if (response.ok) {
+        if (response.status === 200 || response.status === 201) {
           alert('Notification updated successfully.');
         } else {
           alert('Error updating notification.');
         }
+      })
+      .catch((error) => {
+        if (error.response) {
+          setErrorMessage(error.response.data);
+        } else {
+          setErrorMessage('An error occurred. Please try again later.');
+        }
       });
   };
+
+  const handleHomeClick = () => {
+    navigate('/admin');
+  };
+
+  if (!authenticated) {
+    navigate('/admin');
+    return null;
+  }
 
   return (
     <div>
       <Navbar />
-    <div className="container">
-    <div className="signup-container">
-      <div>
-        <h1>Update Notification</h1>
+      <div className="container">
+        <div className="signup-container">
+          <div>
+            <h1>Update Notification</h1>
 
-        <label htmlFor="notificationType">Select Notification Type:</label>
-        <select
-          id="notificationType"
-          value={notificationType}
-          onChange={(e) => setNotificationType(e.target.value)}
-        >
-          <option value="">Select Notification Type</option> {/* Default option */}
-          <option value="promotions">Promotions</option>
-          <option value="releaseEvents">Release Events</option>
-          <option value="latestPlans">Latest Plans</option>
-        </select>
-        <br />
-        <br />
-        <label htmlFor="notificationSubject">Select Notification Subject:</label>
-        <select
-          id="notificationSubject"
-          value={notificationSubject}
-          onChange={(e) => setNotificationSubject(e.target.value)}
-        >
-          <option value="">Select Notification Subject</option> {/* Default option */}
-          {notificationSubjects.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
-        <br />
-        <br />
-        <label htmlFor="notificationContent">Notification Content:</label>
-        <textarea
-          id="notificationContent"
-          rows="5"
-          cols="50"
-          value={notificationContent}
-          onChange={(e) => setNotificationContent(e.target.value)}
-        ></textarea>
+            <label htmlFor="notificationType">Select Notification Type:</label>
+            <select
+              id="notificationType"
+              value={notificationType}
+              onChange={(e) => setNotificationType(e.target.value)}
+            >
+              <option value="">Select Notification Type</option> {/* Default option */}
+              <option value="promotions">Promotions</option>
+              <option value="releaseEvents">Release Events</option>
+              <option value="latestPlans">Latest Plans</option>
+            </select>
+            <br />
+            <br />
+            <label htmlFor="notificationSubject">Select Notification Subject:</label>
+            <select
+              id="notificationSubject"
+              value={notificationSubject}
+              onChange={(e) => setNotificationSubject(e.target.value)}
+            >
+              <option value="">Select Notification Subject</option> {/* Default option */}
+              {notificationSubjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
+            </select>
+            <br />
+            <br />
+            <label htmlFor="notificationContent">Notification Content:</label>
+            <textarea
+              id="notificationContent"
+              rows="5"
+              cols="50"
+              value={notificationContent}
+              onChange={(e) => setNotificationContent(e.target.value)}
+            ></textarea>
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
+          </div>
+          <br />
+          <div>
+            <button onClick={updateNotification} className="create-button">
+              Update Notification
+            </button>
+            
+          </div>
+        </div>
       </div>
-      <br />
-      <div>
-        <button onClick={updateNotification} className="create-button">
-          Update Notification
-        </button>
-      </div>
-    </div>
-    </div>
     </div>
   );
 }

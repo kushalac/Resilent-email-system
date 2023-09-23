@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../Navbar';
 import '../css/Notification.css';
+import { useAuth } from './AuthContext'; // Import the useAuth hook
+import { useNavigate } from 'react-router-dom';
 
 const DeleteNotification = () => {
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
+  const { authenticated } = useAuth(); // Get authentication status from the context
+  const navigate = useNavigate(); // Get navigate function from react-router-dom
 
   // Function to load subjects based on the selected type
   const loadSubjects = () => {
@@ -43,6 +47,11 @@ const DeleteNotification = () => {
         // Optionally, you can reset the selectedSubject
         setSelectedSubject('');
         alert('Notification deleted successfully.');
+        // Check if the user is authenticated and stay on the same page
+        if (!authenticated) {
+          // If not authenticated, redirect to login page
+          navigate('/admin');
+        }
       } else {
         return response.json(); // Parse the response body as JSON
       }
@@ -62,6 +71,10 @@ const DeleteNotification = () => {
   useEffect(() => {
     loadSubjects();
   }, [notificationType]);
+  if (!authenticated) {
+    // If not authenticated, redirect to login page
+    navigate('/admin');
+  }
 
   return (
     <div>
@@ -78,7 +91,7 @@ const DeleteNotification = () => {
                   setNotificationType(e.target.value);
                 }}
               >
-                <option value="">Select Notification Type</option> {/* Default option */}
+                <option value="">Select Notification Type</option>
                 <option value="promotions">Promotions</option>
                 <option value="releaseEvents">Release Events</option>
                 <option value="latestPlans">Latest Plans</option>
@@ -93,7 +106,7 @@ const DeleteNotification = () => {
                 value={selectedSubject}
                 onChange={(e) => setSelectedSubject(e.target.value)}
               >
-                <option value="">Select Notification Subject</option> {/* Default option */}
+                <option value="">Select Notification Subject</option>
                 {notificationSubjects.map((subject) => (
                   <option key={subject} value={subject}>
                     {subject}

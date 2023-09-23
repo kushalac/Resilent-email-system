@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import '../css/Notification.css';
+import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 const SendNotification = () => {
+  const navigate = useNavigate();
+  const { authenticated } = useAuth();
+
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
@@ -26,6 +31,13 @@ const SendNotification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if the user is authenticated before sending the notification
+    if (!authenticated) {
+      // Redirect to the admin sign-in if not authenticated
+      navigate('/admin');
+      return;
+    }
 
     // Prepare data to send to the server
     const requestData = {
@@ -66,15 +78,23 @@ const SendNotification = () => {
         const data = await response.json();
         setNotificationSubjects(data);
       } else {
-        throw new Error(`Server response was not ok (status ${response.status})`);
+        throw Error(`Server response was not ok (status ${response.status})`);
       }
     } catch (error) {
       console.error("Error fetching notification subjects:", error);
     }
   };
 
+  const handleHomeClick = () => {
+    navigate('/admin');
+  };
+
+  if (!authenticated) {
+    navigate('/admin');
+    return null;
+  }
+
   return (
-   
     <div>
       <Navbar />
       <div className="container">
@@ -126,4 +146,5 @@ const SendNotification = () => {
     </div>
   );
 };
+
 export default SendNotification;

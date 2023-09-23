@@ -197,3 +197,31 @@ input[type="email"] {
   align-items: center;
   min-height: 100vh;
 }
+
+/* NavbarAdmin.css */
+.navbar-admin {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+}
+
+.nav-list-admin {
+  list-style-type: none;
+  padding: 0;
+  text-align: center;
+}
+
+.nav-item-admin {
+  display: inline;
+  margin-right: 20px;
+}
+
+.nav-link-admin {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+}
+
+.nav-link-admin:hover {
+  text-decoration: underline;
+}
