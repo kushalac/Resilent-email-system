@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../css/Signup.css';
+import Navbar from '../Navbar';
+
 
 function Signup() {
+  
+  const navigate = useNavigate();
+  
   const initialFormData = {
     name: '',
     email: '',
@@ -71,6 +77,7 @@ function Signup() {
         if (response.status === 201) {
           alert('User has been created successfully');
           setFormData(initialFormData);
+          navigate('/signin');
         } else {
           alert(response.data.message);
         }
@@ -82,12 +89,14 @@ function Signup() {
   };
 
   return (
+    <div className="sign-container">
+      <Navbar />
     <div className="container">
-      <div className="signup-container">
-        <h1>Sign Up</h1>
+      <div className="signup-container" style={{ marginTop: '100px' }}>
+        <h2>Sign Up</h2>
         <form id="signup-form">
           <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name" className="label-left">Name</label>
             <input
               type="text"
               id="name"
@@ -96,10 +105,11 @@ function Signup() {
               value={formData.name}
               onChange={handleChange}
               required
+              style={{ width: '100%' }}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email" className="label-left">Email</label>
             <input
               type="email"
               id="email"
@@ -108,10 +118,11 @@ function Signup() {
               value={formData.email}
               onChange={handleChange}
               required
+              style={{ width: '100%' }}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div className="form-group" >
+            <label htmlFor="password" className="label-left">Password</label>
             <input
               type="password"
               id="password"
@@ -120,10 +131,11 @@ function Signup() {
               value={formData.password}
               onChange={handleChange}
               required
+              style={{ width: '100%' }}
             />
           </div>
           <div className="form-group">
-            <label>Receive Notifications</label>
+            <label>Would you like to Receive Notifications?</label>
             <div className="notification-radio">
               <label htmlFor="yes">Yes</label>
               <input
@@ -154,7 +166,7 @@ function Signup() {
             id="notification-options"
             style={{ display: formData.receiveNotifications ? 'block' : 'none' }}
           >
-            <label>Notification Types</label>
+            <label>What kind of notifications you would like?</label>
             <div className="checkbox-group">
               <label htmlFor="promotions">Promotions</label>
               <input
@@ -186,11 +198,12 @@ function Signup() {
               />
             </div>
           </div>
-          <button type="button" className="signup-button" onClick={handleFormSubmit}>
+          <button type="button" className="create-button" style={{ marginTop: '30px' }} onClick={handleFormSubmit}>
             Sign Up
           </button>
         </form>
       </div>
+    </div>
     </div>
   );
 }

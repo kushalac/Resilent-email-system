@@ -112,13 +112,16 @@ textarea {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     background-image: linear-gradient(45deg, #3498db, #45B3CF);
     width: auto;
+    text-transform: none; /* Prevent full caps */
 }
 
 .signup-button:hover {
-    background-image: linear-gradient(45deg, #4CAF50, #45B3CF); /* Green gradient on hover */
+    background-image: linear-gradient(45deg, #d8a16a, #ffb151); /* Green gradient on hover */
     transform: scale(1.05);
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
+
+
 
 .create-button {
     background-color: #45b3cf; /* Blue background */
@@ -174,7 +177,8 @@ textarea {
     transition: background-image 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: auto;
-    margin-top: -50px; /* Add margin to create space between the elements */
+    margin-top: 20px ; /* Add margin to create space between the elements */
+    display: block;
 }
 
 .update-button:hover {
@@ -199,7 +203,7 @@ textarea {
 }
 
 .delete-button:hover {
-    background-image: linear-gradient(45deg, #e33d3d, #ff5d4a); /* Yellowish gradient on hover */
+    background-image: linear-gradient(45deg, #e87272, #ff5d4a); /* Yellowish gradient on hover */
     transform: scale(1.05);
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }

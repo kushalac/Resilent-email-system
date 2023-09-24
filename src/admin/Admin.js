@@ -13,7 +13,7 @@ import { faBell, faEdit, faEnvelope, faTrash, faSignOutAlt } from '@fortawesome/
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { authenticated, logout } = useAuth(); // Use the authenticated state and logout function from the AuthContext
+  const { adminAuthenticated, logoutAdmin } = useAuth(); // Use the authenticated state and logout function from the AuthContext
 
   const handleCreateNotificationClick = () => {
     navigate('/CreateNotification');
@@ -32,11 +32,11 @@ const Admin = () => {
   };
 
   const handleLogout = () => {
-    logout(); // Call the logout function to log out the user
+    logoutAdmin(); // Call the logout function to log out the user
   };
 
   // Check if the user is authenticated before rendering the admin content
-  if (!authenticated) {
+  if (!adminAuthenticated) {
     // Render the login form if not authenticated
     return (
       <div>

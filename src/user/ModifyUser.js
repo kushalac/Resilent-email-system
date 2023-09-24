@@ -1,36 +1,31 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../admin/AuthContext';
+import Navbar from '../Navbar';
 
-class ModifyUser extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: '',
-      name: '',
-      receiveNotifications: false,
-      promotions: false,
-      latestPlans: false,
-      releaseEvents: false,
-      userDataVisible: false,
-    };
-  }
+function ModifyUser() {
+  const { userAuthenticated } = useAuth();
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [receiveNotifications, setReceiveNotifications] = useState(false);
+  const [promotions, setPromotions] = useState(false);
+  const [latestPlans, setLatestPlans] = useState(false);
+  const [releaseEvents, setReleaseEvents] = useState(false);
+  const [userDataVisible, setUserDataVisible] = useState(false);
 
-  toggleNotificationOptions = () => {
-    this.setState((prevState) => ({
-      receiveNotifications: !prevState.receiveNotifications,
-      userDataVisible: true, // Show the notification options when Receive Notifications is checked
-    }));
+  useEffect(() => {
+    // Redirect to '/SigninUser' if not authenticated
+    if (!userAuthenticated) {
+      window.location.href = '/signin';
+    }
+  }, [userAuthenticated]);
+
+  const toggleNotificationOptions = () => {
+    setReceiveNotifications((prevState) => !prevState);
+    setUserDataVisible(true);
   };
 
-  updateUser = () => {
-    const {
-      email,
-      name,
-      receiveNotifications,
-      promotions,
-      latestPlans,
-      releaseEvents,
-    } = this.state;
-
+  const updateUser = (e) => {
+    e.preventDefault(); 
     const userData = {
       email,
       name,
@@ -54,22 +49,19 @@ class ModifyUser extends Component {
       .then((message) => {
         if (message === 'User updated successfully') {
           alert('User updated successfully');
-          window.location.href = '/SigninUser';
         } else {
           alert('An error occurred while updating the user.');
         }
-        this.toggleHidden('result', true);
+        setUserDataVisible(false); // Hide the user data modification section
       })
       .catch((error) => {
         console.error('Error:', error);
         alert('An error occurred while updating the user.');
-        this.toggleHidden('result', true);
+        setUserDataVisible(false); // Hide the user data modification section
       });
   };
 
-  checkUser = () => {
-    const { email } = this.state;
-
+  const checkUser = () => {
     // Check if the email field is empty
     if (!email) {
       alert('Please enter an email.');
@@ -92,63 +84,52 @@ class ModifyUser extends Component {
       .then((data) => {
         if (data.exists) {
           // User exists, show the modify data section
-          this.toggleHidden('userData', true);
+          setUserDataVisible(true);
 
           // Populate existing user data
-          this.setState({
-            name: data.user.name,
-            receiveNotifications: data.user.receiveNotifications,
-          });
+          setName(data.user.name);
+          setReceiveNotifications(data.user.receiveNotifications);
 
           // Check if Receive Notifications is checked and show/hide options accordingly
-          this.toggleNotificationOptions();
+          toggleNotificationOptions();
         } else {
           alert('User not found.');
-          this.toggleHidden('result', true);
-          // Hide the user data modification section
-          this.toggleHidden('userData', false);
+          setUserDataVisible(false); // Hide the user data modification section
         }
       })
       .catch((error) => {
         console.error('Error:', error);
         alert(`An error occurred while checking the user: ${error.message}`);
-        this.toggleHidden('result', true);
-        // Hide the user data modification section
-        this.toggleHidden('userData', false);
+        setUserDataVisible(false); // Hide the user data modification section
       });
   };
 
-  toggleHidden(elementId, isVisible) {
-    const element = document.getElementById(elementId);
-    if (element) {
-      element.style.display = isVisible ? 'block' : 'none';
-    }
-  }
-
-  render() {
-    return (
+  return (
+    <div>
+      <Navbar />
       <div className="container">
-        <div className="signup-container">
-          <div>
-            <h1>User Data Modification</h1>
-            <label htmlFor="email">Enter your email:</label>
-            <input
-              type="email"
-              id="email"
-              placeholder="Email"
-              required
-              className="input-field"
-              value={this.state.email}
-              onChange={(e) => this.setState({ email: e.target.value })}
-            />
+        <div className="signup-container" style={{ marginTop: '90px', marginBottom: '90px' }}>
+          <h2>User Data Modification</h2>
+          <label htmlFor="email" className="label-left">
+            Enter your email:
+          </label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+            className="input-field"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: '100%' }}
+          />
           <div className="center-button">
-            <button onClick={this.checkUser} className="signup-button button-spacing">
+            <button onClick={checkUser} className="signup-button button-spacing">
               Check User
             </button>
           </div>
-          </div>
 
-          {this.state.userDataVisible && (
+          {userDataVisible && (
             <div id="userData">
               <h2>Modify User Data</h2>
               <label htmlFor="name">Name:</label>
@@ -157,62 +138,113 @@ class ModifyUser extends Component {
                 id="name"
                 placeholder="Name"
                 required
-                value={this.state.name}
-                onChange={(e) => this.setState({ name: e.target.value })}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <br />
               <div className="form-group">
-                <br></br>
-                <label htmlFor="receiveNotifications"style={{ display: 'inline-block', paddingTop: '0px' }}>
+                <br />
+                <label
+                  htmlFor="receiveNotifications"
+                  style={{ display: 'block' }}
+                >
                   Receive Notifications:
                 </label>
-                <input
-                  type="checkbox"
-                  id="receiveNotifications"
-                  checked={this.state.receiveNotifications}
-                  onChange={this.toggleNotificationOptions}
-                />
+                <div className="notification-radio">
+                  <label htmlFor="yes">Yes</label>
+                  <input
+                    type="radio"
+                    id="yes"
+                    name="receiveNotifications"
+                    value="yes"
+                    checked={receiveNotifications === true}
+                    onChange={() => setReceiveNotifications(true)}
+                    required
+                  />
+                </div>
+                <div className="notification-radio">
+                  <label htmlFor="no">No</label>
+                  <input
+                    type="radio"
+                    id="no"
+                    name="receiveNotifications"
+                    value="no"
+                    checked={receiveNotifications === false}
+                    onChange={() => setReceiveNotifications(false)}
+                    required
+                  />
+                </div>
               </div>
-              {this.state.receiveNotifications && (
+
+              {receiveNotifications && (
                 <div id="notificationOptions">
-                  <label>Notification Preferences:</label>
+                  <label
+                    style={{
+                      display: 'block',
+                      textAlign: 'center', // Center align the labels
+                    }}
+                  >
+                    Notification Preferences:
+                  </label>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <input
-                      type="checkbox"
-                      id="promotions"
-                      checked={this.state.promotions}
-                      onChange={() => this.setState({ promotions: !this.state.promotions })}
-                    />
-                    <label htmlFor="promotions" style={{ marginLeft: '5px', marginRight: '5px', marginBottom: '0' }}>Promotions</label>
-                    <input
-                      type="checkbox"
-                      id="latestPlans"
-                      checked={this.state.latestPlans}
-                      onChange={() => this.setState({ latestPlans: !this.state.latestPlans })}
-                    />
-                    <label htmlFor="latestPlans" style={{ marginLeft: '5px', marginRight: '5px', marginBottom: '0' }}>Latest Plans</label>
-                    <input
-                      type="checkbox"
-                      id="releaseEvents"
-                      checked={this.state.releaseEvents}
-                      onChange={() => this.setState({ releaseEvents: !this.state.releaseEvents })}
-                    />
-                    <label htmlFor="releaseEvents" style={{ marginLeft: '5px', marginBottom: '0' }}>Release Events</label>
+                    <div className="checkbox-group">
+                      <label
+                        htmlFor="promotions"
+                        style={{ textAlign: 'center', paddingLeft: '30px' }} // Center align the label
+                      >
+                        Promotions
+                      </label>
+                      <input
+                        type="checkbox"
+                        id="promotions"
+                        checked={promotions}
+                        onChange={() => setPromotions(!promotions)}
+                      />
+                    </div>
+                    <div className="checkbox-group">
+                      <label
+                        htmlFor="latestPlans"
+                        style={{ textAlign: 'center' }} // Center align the label
+                      >
+                        Latest Plans
+                      </label>
+                      <input
+                        type="checkbox"
+                        id="latestPlans"
+                        checked={latestPlans}
+                        onChange={() => setLatestPlans(!latestPlans)}
+                      />
+                    </div>
+                    <div className="checkbox-group">
+                      <label
+                        htmlFor="releaseEvents"
+                        style={{ textAlign: 'center' }} // Center align the label
+                      >
+                        Release Events
+                      </label>
+                      <input
+                        type="checkbox"
+                        id="releaseEvents"
+                        checked={releaseEvents}
+                        onChange={() => setReleaseEvents(!releaseEvents)}
+                      />
+                    </div>
                   </div>
                 </div>
               )}
+
               <br />
               <div className="center-button">
-              <button onClick={this.updateUser} className="signup-button">
-                Update User
-              </button>
+                <button type="button" onClick={updateUser} className="update-button">
+                  Update User
+                </button>
               </div>
             </div>
           )}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default ModifyUser;

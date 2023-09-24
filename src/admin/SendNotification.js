@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 const SendNotification = () => {
   const navigate = useNavigate();
-  const { authenticated } = useAuth();
+  const { adminAuthenticated } = useAuth();
 
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
@@ -33,7 +33,7 @@ const SendNotification = () => {
     e.preventDefault();
 
     // Check if the user is authenticated before sending the notification
-    if (!authenticated) {
+    if (!adminAuthenticated) {
       // Redirect to the admin sign-in if not authenticated
       navigate('/admin');
       return;
@@ -89,7 +89,7 @@ const SendNotification = () => {
     navigate('/admin');
   };
 
-  if (!authenticated) {
+  if (!adminAuthenticated) {
     navigate('/admin');
     return null;
   }

@@ -5,18 +5,36 @@ const AuthContext = createContext();
 
 // Create an AuthProvider component to manage authentication state
 export function AuthProvider({ children }) {
-  const [authenticated, setAuthenticated] = useState(false);
+  const [userAuthenticated, setUserAuthenticated] = useState(false);
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
 
-  const login = () => {
-    setAuthenticated(true);
+  const loginUser = () => {
+    setUserAuthenticated(true);
   };
 
-  const logout = () => {
-    setAuthenticated(false);
+  const logoutUser = () => {
+    setUserAuthenticated(false);
+  };
+
+  const loginAdmin = () => {
+    setAdminAuthenticated(true);
+  };
+
+  const logoutAdmin = () => {
+    setAdminAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ authenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        userAuthenticated,
+        adminAuthenticated,
+        loginUser,
+        logoutUser,
+        loginAdmin,
+        logoutAdmin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -4,11 +4,12 @@ import { useAuth } from './admin/AuthContext'; // Import the useAuth hook
 import './styles.css'; // Import the CSS file
 
 const Navbar = () => {
-  const { logout } = useAuth(); // Use the logout function from the AuthContext
+  const { logoutUser,logoutAdmin } = useAuth(); // Use the logout function from the AuthContext
 
   const handleHomeClick = () => {
     // Call the logout function to log out the user
-    logout();
+    logoutAdmin();
+    logoutUser();
   };
 
   return (

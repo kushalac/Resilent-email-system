@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext'; // Import the useAuth hook
 import Navbar from '../Navbar';
 
 const Login = () => {
-  const { login } = useAuth(); // Use the login function from the AuthContext
+  const { loginAdmin } = useAuth(); // Use the login function from the AuthContext
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -12,7 +12,7 @@ const Login = () => {
     // Check if the entered username and password are correct.
     // For simplicity, let's assume hardcoded values.
     if (username === 'admin' && password === 'admin') {
-      login(); // Call the login function to set the authenticated state to true
+      loginAdmin(); // Call the login function to set the authenticated state to true
     } else {
       alert('Invalid credentials. Please try again.');
     }
@@ -22,7 +22,7 @@ const Login = () => {
     <div>
       <Navbar />
     <div className="container">
-      <div className="signup-container">
+      <div className="signup-container" style={{ marginTop: '220px' }}>
       <h2>Login</h2>
       <div className='form-group'>
         <input
@@ -30,6 +30,7 @@ const Login = () => {
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          style={{ width: '100%' }}
         />
       </div>
       <div className='form-group'>
@@ -38,6 +39,7 @@ const Login = () => {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          style={{ width: '100%' }}
         />
       </div>
       <div>

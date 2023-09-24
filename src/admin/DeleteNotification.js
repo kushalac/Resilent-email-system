@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../Navbar';
+import axios from 'axios';
 import '../css/Notification.css';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 import { useNavigate } from 'react-router-dom';
 
-const DeleteNotification = () => {
+function DeleteNotification() {
+  const navigate = useNavigate();
+  const { adminAuthenticated, loginAdmin } = useAuth();
+
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
-  const { authenticated } = useAuth(); // Get authentication status from the context
-  const navigate = useNavigate(); // Get navigate function from react-router-dom
+
+  useEffect(() => {
+    loadSubjects();
+  }, [notificationType]);
 
   // Function to load subjects based on the selected type
-  const loadSubjects = () => {
+  const loadSubjects = useCallback(() => {
     // Make an AJAX request to fetch subjects based on the selected type
     fetch(`http://localhost:8080/notification/getNotificationSubjects?notificationType=${notificationType}`)
       .then((response) => response.json())
@@ -25,56 +31,52 @@ const DeleteNotification = () => {
       .catch((error) => {
         console.error("Error loading subjects:", error);
       });
-  };
+  }, [notificationType]);
 
   // Function to delete the notification
-  const deleteNotification = () => {
-    // Check if a subject is selected
+  const deleteNotification = useCallback(async (e) => {
+    e.preventDefault(); 
     if (!selectedSubject) {
       alert('Please select a notification subject.');
       return;
     }
-
-    // Make an AJAX request to delete the notification
-    fetch(`http://localhost:8080/notification/deleteNotification?notificationType=${notificationType}&notificationSubject=${selectedSubject}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((response) => {
-      if (response.ok) {
-        // Optionally, you can reset the selectedSubject
-        setSelectedSubject('');
+  
+    try {
+      const response = await axios.delete(`http://localhost:8080/notification/deleteNotification`, {
+        params: {
+          notificationType,
+          notificationSubject: selectedSubject,
+        },
+      });
+  
+      if (response.status === 200 || response.status === 204) {
         alert('Notification deleted successfully.');
-        // Check if the user is authenticated and stay on the same page
-        if (!authenticated) {
-          // If not authenticated, redirect to login page
-          navigate('/admin');
-        }
+        // Additional code to execute after successful deletion
       } else {
-        return response.json(); // Parse the response body as JSON
+        alert('Error deleting notification.');
+        // Additional code to handle the error
       }
-    })
-    .then((errorData) => {
-      if (errorData) {
-        alert(`Error deleting notification: ${errorData.message}`);
+    } catch (error) {
+      if (error.response) {
+        alert(`Error deleting notification: ${error.response.data.message}`);
+      } else {
+        alert('An error occurred while deleting the notification.');
       }
-    })
-    .catch((error) => {
-      console.error('Error deleting notification:', error);
-      alert('An error occurred while deleting the notification.');
-    });
-  };
+      // Additional code to handle the error
+    }
+  }, [notificationType, selectedSubject]);
+  
+  
 
-  // Fetch initial notification subjects when notificationType changes
   useEffect(() => {
-    loadSubjects();
-  }, [notificationType]);
-  if (!authenticated) {
-    // If not authenticated, redirect to login page
-    navigate('/admin');
-  }
+    // Redirect to '/admin' if not authenticated
+    if (!adminAuthenticated) {
+      //loginAdmin();
+      console.log('adminAuthenticated:', adminAuthenticated);
+      navigate('/admin');
+    }
+  }, [adminAuthenticated, navigate]);
+
 
   return (
     <div>
@@ -125,6 +127,6 @@ const DeleteNotification = () => {
       </div>
     </div>
   );
-};
+}
 
 export default DeleteNotification;

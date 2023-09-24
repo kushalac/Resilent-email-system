@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../css/Signup.css';
+import Navbar from '../Navbar';
+import { useAuth } from '../admin/AuthContext';
 
 const Signin = () => {
+  
+  const { loginUser } = useAuth();
   const navigate = useNavigate();
 
   const initialFormData = {
@@ -34,6 +38,7 @@ const Signin = () => {
       .then((response) => {
         if (response.status === 200) {
           // Sign-in successful
+          loginUser();
           navigate('/SigninUser'); // Redirect to the user page
         } else {
           // Handle sign-in failure, show error message
@@ -47,34 +52,42 @@ const Signin = () => {
   };
 
   return (
-    <div className="signup-container">
-      <h1>Sign In</h1>
+    <div>
+      <Navbar />
+      <div className="container">
+    <div className="signup-container" style={{ marginTop: '200px' }}>
+       
+      <h2>Sign In</h2>
       <form>
         <div className="form-group">
-          <label>Email:</label>
+          <label className="label-left">Email:</label>
           <input
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             required
+            style={{ width: '100%' }}
           />
         </div>
         <div className="form-group">
-          <label>Password:</label>
+          <label className="label-left">Password:</label>
           <input
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
             required
+            style={{ width: '100%' }}
           />
         </div>
-        <button type="button" className="signup-button"  onClick={handleSignIn}>
+        <button type="button" className="create-button"  onClick={handleSignIn}>
           Sign In
         </button>
         {error && <p className="error-message">{error}</p>}
       </form>
+    </div>
+    </div>
     </div>
   );
 };

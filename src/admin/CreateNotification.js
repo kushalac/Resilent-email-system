@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext';
 
 function CreateNotification() {
   const navigate = useNavigate();
-  const { authenticated } = useAuth();
+  const { adminAuthenticated } = useAuth();
 
   const [formData, setFormData] = useState({
     notificationType: '',
@@ -32,8 +32,6 @@ function CreateNotification() {
             notificationSubject: '',
             notificationContent: '',
           });
-          // Redirect to another page after successful submission
-          navigate('/some-other-page');
         } else {
           setErrorMessage('An error occurred. Please try again later.');
         }
@@ -53,16 +51,16 @@ function CreateNotification() {
 
   useEffect(() => {
     // Redirect to '/admin' if not authenticated
-    if (!authenticated) {
+    if (!adminAuthenticated) {
       navigate('/admin');
     }
-  }, [authenticated, navigate]);
+  }, [adminAuthenticated, navigate]);
 
   return (
     <div>
       <Navbar />
       <div className="container">
-        <div className="signup-container">
+        <div className="signup-container" >
           <h2>Create New Notification</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">

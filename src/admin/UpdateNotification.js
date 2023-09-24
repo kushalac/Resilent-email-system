@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 function UpdateNotification() {
   const navigate = useNavigate();
-  const { authenticated } = useAuth();
+  const { adminAuthenticated } = useAuth();
 
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
@@ -34,6 +34,7 @@ function UpdateNotification() {
     fetch(`http://localhost:8080/notification/getNotificationSubjects?notificationType=${notificationType}`)
       .then((response) => response.json())
       .then((subjects) => {
+        console.log(subjects);
         setNotificationSubjects(subjects);
         if (subjects.length > 0) {
           // Set the first subject as default
@@ -111,7 +112,8 @@ function UpdateNotification() {
     navigate('/admin');
   };
 
-  if (!authenticated) {
+  if (!adminAuthenticated) {
+
     navigate('/admin');
     return null;
   }
@@ -120,9 +122,9 @@ function UpdateNotification() {
     <div>
       <Navbar />
       <div className="container">
-        <div className="signup-container">
+        <div className="update-container">
           <div>
-            <h1>Update Notification</h1>
+            <h2>Update Notification</h2>
 
             <label htmlFor="notificationType">Select Notification Type:</label>
             <select
@@ -163,8 +165,8 @@ function UpdateNotification() {
             {errorMessage && <p className="error-message">{errorMessage}</p>}
           </div>
           <br />
-          <div>
-            <button onClick={updateNotification} className="create-button">
+          <div className="button-container" style={{ marginTop: '10px' }}>
+            <button onClick={updateNotification} className="update-button">
               Update Notification
             </button>
             
