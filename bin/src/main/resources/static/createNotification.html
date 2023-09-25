@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Notification</title>
+    <style>
+        /* Add your CSS styles here for styling the form */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        label {
+            font-weight: bold;
+        }
+        select, input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Reduce the width of the content textarea */
+        #notificationContent {
+            width: 90%; /* Adjust the width as needed */
+        }
+    </style>
+     <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="signup-container">
+        <h2>Create New Notification</h2>
+        <form id="notificationForm">
+            <label for="notificationType">Notification Type:</label>
+            <select id="notificationType" name="notificationType">
+                <option value="promotions">Promotions</option>
+                <option value="latestPlans">Latest Plans</option>
+                <option value="releaseEvents">Release Events</option>
+            </select>
+
+            <label for="notificationSubject">Subject:</label>
+            <input type="text" id="notificationSubject" name="notificationSubject" required>
+
+            <label for="notificationContent">Content:</label>
+            <textarea id="notificationContent" name="notificationContent" rows="4" required></textarea>
+
+            <button type="submit" class="signup-button">Create Notification</button>
+        </form>
+    </div>
+
+    <script>
+        // JavaScript for handling form submission
+        document.getElementById("notificationForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Get form data
+            const notificationType = document.getElementById("notificationType").value;
+            const notificationSubject = document.getElementById("notificationSubject").value;
+            const notificationContent = document.getElementById("notificationContent").value;
+
+            // Send form data to the server (you can use fetch or an AJAX library here)
+            // Replace the URL with your server endpoint
+            fetch("notification/createNotification", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    notificationType,
+                    notificationSubject,
+                    notificationContent
+                })
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Display the response as an alert
+                window.alert(data);
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>

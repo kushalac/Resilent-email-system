@@ -100,7 +100,7 @@ public class UserController {
             }
             if(user.isActive())
             {
-            	return ResponseEntity.ok("Sign-in successful");
+            	return ResponseEntity.ok(user.getName());
             }
             else {
             	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");

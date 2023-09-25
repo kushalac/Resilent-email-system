@@ -25,15 +25,7 @@
     			<groupId>org.springframework.boot</groupId>
     			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
-		<dependency>
-        	<groupId>org.mongodb</groupId>
-        	<artifactId>mongo-java-driver</artifactId>
-        	<version>3.12.14</version> <!-- Specify the desired version -->
-    	</dependency>
-		<dependency>
-        	<groupId>org.springframework.boot</groupId>
-        	<artifactId>spring-boot-starter-freemarker</artifactId>
-    	</dependency>
+
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -81,13 +73,6 @@
         <artifactId>spring-kafka</artifactId>
         <!-- Use the appropriate version for your project -->
     </dependency>
-    
-    <dependency>
-	    <groupId>org.springframework.security</groupId>
-	    <artifactId>spring-security-core</artifactId>
-	    <version>5.5.0</version> <!-- Use the appropriate version -->
-	</dependency>
-
 
 
 	</dependencies>
