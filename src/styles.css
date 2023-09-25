@@ -1,3 +1,11 @@
+.logout-button {
+
+  /* Position the button to the top-right corner */
+  position: absolute;
+
+  right: 20px;
+}
+
 .navbar {
   background-color: #333; /* Darker background color for a sleek look */
   color: #fff; /* White text color */

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../admin/AuthContext';
 import Navbar from '../Navbar';
+import { useLocation } from 'react-router-dom';
 
 function DeleteUser() {
-  const [email, setEmail] = useState('');
+  const location = useLocation();
+  const userEmail = location.state?.userEmail;
+  const [email, setEmail] = useState(userEmail || '');
   const { userAuthenticated } = useAuth();
   
   useEffect(() => {
@@ -49,17 +52,17 @@ function DeleteUser() {
         <h2>Delete User</h2>
         <form id="delete-form">
           <div className="form-group">
-            <label htmlFor="email" className="label-left">Email</label>
+            <label htmlFor="email" className="label-left">Confirm your Email Id:</label>
             <input
               type="email"
               id="email"
-              name="email"
-              placeholder="Enter user's email"
+              placeholder="Email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              className="input-field"
+              value={userEmail} // Use userEmail obtained from useLocation
+              readOnly // Make the input field read-only
               style={{ width: '100%' }}
-            />
+          />
           </div>
           <button type="button" onClick={deleteUser} className="delete-button" style={{ marginTop: '30px' }} >
             Delete User

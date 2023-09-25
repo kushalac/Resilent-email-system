@@ -37,9 +37,9 @@ const Signin = () => {
       .post('http://localhost:8080/signin', formData) // Replace with your backend URL
       .then((response) => {
         if (response.status === 200) {
-          // Sign-in successful
+          const userName = response.data;
           loginUser();
-          navigate('/SigninUser'); // Redirect to the user page
+          navigate('/SigninUser', { state: { userEmail: formData.email,userName } }); // Redirect to the user page
         } else {
           // Handle sign-in failure, show error message
           setError('Sign-in failed. Please check your credentials.');

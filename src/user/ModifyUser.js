@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../admin/AuthContext';
 import Navbar from '../Navbar';
+import { useLocation } from 'react-router-dom';
 
 function ModifyUser() {
+  const location = useLocation();
+  const userEmail = location.state?.userEmail;
   const { userAuthenticated } = useAuth();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(userEmail || '');
   const [name, setName] = useState('');
   const [receiveNotifications, setReceiveNotifications] = useState(false);
   const [promotions, setPromotions] = useState(false);
@@ -111,18 +114,19 @@ function ModifyUser() {
         <div className="signup-container" style={{ marginTop: '90px', marginBottom: '90px' }}>
           <h2>User Data Modification</h2>
           <label htmlFor="email" className="label-left">
-            Enter your email:
+            Confirm your Email Id:
           </label>
           <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            required
-            className="input-field"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: '100%' }}
+              type="email"
+              id="email"
+              placeholder="Email"
+              required
+              className="input-field"
+              value={userEmail} // Use userEmail obtained from useLocation
+              readOnly // Make the input field read-only
+              style={{ width: '100%' }}
           />
+
           <div className="center-button">
             <button onClick={checkUser} className="signup-button button-spacing">
               Check User
