@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Navbar from '../Navbar';
+import Navbar from '../AdminNavbar';
 import axios from 'axios';
 import '../css/Notification.css';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function DeleteNotification() {
   const navigate = useNavigate();
-  const { adminAuthenticated, loginAdmin } = useAuth();
+  const { adminAuthenticated} = useAuth();
 
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);

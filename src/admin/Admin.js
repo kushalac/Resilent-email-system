@@ -1,19 +1,21 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+import Navbar from '../AdminNavbar';
 import '../css/admin.css';
-import { useAuth } from './AuthContext'; // Import the useAuth hook
-import Login from './Login'; // Make sure the path to Login.js is correct
-
-
-
-// Import FontAwesome components and icons
+import { useAuth } from './AuthContext';
+import Login from './Login';
+import { faChartBar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBell, faEdit, faEnvelope, faTrash, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBell,
+  faEdit,
+  faEnvelope,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { adminAuthenticated, logoutAdmin } = useAuth(); // Use the authenticated state and logout function from the AuthContext
+  const { adminAuthenticated } = useAuth();
 
   const handleCreateNotificationClick = () => {
     navigate('/CreateNotification');
@@ -26,18 +28,16 @@ const Admin = () => {
   const handleUpdateNotificationClick = () => {
     navigate('/UpdateNotification');
   };
-  
+
   const handleDeleteNotificationClick = () => {
     navigate('/DeleteNotification');
   };
 
-  const handleLogout = () => {
-    logoutAdmin(); // Call the logout function to log out the user
+  const handleDashboardClick = () => {
+    navigate('/Dashboard'); // Navigate to the Dashboard page
   };
 
-  // Check if the user is authenticated before rendering the admin content
   if (!adminAuthenticated) {
-    // Render the login form if not authenticated
     return (
       <div>
         <Login />
@@ -45,48 +45,42 @@ const Admin = () => {
     );
   }
 
-  // Render the admin content if authenticated
   return (
     <div className="admin-container">
       <Navbar />
       <div className="containerbuttons">
         <h1 className="typing-text">Welcome Admin</h1>
-        
-        {/* Buttons Container */}
+
         <div className="button-container">
-          {/* Create Notification Button */}
           <button className="square-button" onClick={handleCreateNotificationClick}>
-            <FontAwesomeIcon icon={faEnvelope} />&nbsp; {/* Add non-breaking space here */}
+            <FontAwesomeIcon icon={faEnvelope} />&nbsp;
             <span className="button-text">Create Notification</span>
           </button>
 
-          {/* Update Notification Button */}
           <button className="square-button" onClick={handleUpdateNotificationClick}>
-            <FontAwesomeIcon icon={faEdit} />&nbsp; {/* Add non-breaking space here */}
+            <FontAwesomeIcon icon={faEdit} />&nbsp;
             <span className="button-text">Update Notification</span>
           </button>
         </div>
 
         <div className="button-container">
-          {/* Send Notification Button */}
           <button className="square-button" onClick={handleSendNotificationClick}>
-            <FontAwesomeIcon icon={faBell} />&nbsp; {/* Add non-breaking space here */}
+            <FontAwesomeIcon icon={faBell} />&nbsp;
             <span className="button-text">Send Notification</span>
           </button>
 
-          {/* Delete Notification Button */}
           <button className="square-button" onClick={handleDeleteNotificationClick}>
-            <FontAwesomeIcon icon={faTrash} />&nbsp; {/* Add non-breaking space here */}
+            <FontAwesomeIcon icon={faTrash} />&nbsp;
             <span className="button-text">Delete Notification</span>
           </button>
         </div>
-        
+
         <div className="button-container">
-        <button className="square-button" onClick={handleLogout}>
-         <FontAwesomeIcon icon={faSignOutAlt} />&nbsp;
-        <span className="button-text">Logout</span>
-        </button>
-      </div>
+          <button className="square-button" onClick={handleDashboardClick}>
+            <FontAwesomeIcon icon={faChartBar} />&nbsp;
+            <span className="button-text">Dashboard</span>
+          </button>
+        </div>
       </div>
     </div>
   );

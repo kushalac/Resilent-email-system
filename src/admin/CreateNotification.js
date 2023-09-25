@@ -1,8 +1,9 @@
 import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+import Navbar from '../AdminNavbar';
 import { useAuth } from './AuthContext';
+
 
 function CreateNotification() {
   const navigate = useNavigate();
@@ -45,9 +46,6 @@ function CreateNotification() {
       });
   };
 
-  const handleHomeClick = () => {
-    navigate('/admin');
-  };
 
   useEffect(() => {
     // Redirect to '/admin' if not authenticated

@@ -13,6 +13,7 @@ import UpdateNotification from './admin/UpdateNotification';
 import SendNotification from './admin/SendNotification';
 import DeleteNotification from './admin/DeleteNotification';
 import { AuthProvider } from './admin/AuthContext'; // Import the AuthProvider
+import Dashboard from './admin/Dashboard';
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/SigninUser" element={<SigninUser />} />
           <Route path="/ModifyUser" element={<ModifyUser />} />
           <Route path="/DeleteUser" element={<DeleteUser />} />
+          <Route path="/Dashboard" element={<Dashboard />} /> 
           <Route path="/" element={<Homepage />} />
         </Routes>
       </AuthProvider>

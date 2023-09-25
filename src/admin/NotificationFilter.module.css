@@ -1,0 +1,84 @@
+/* NotificationFilter Container */
+.notification-filter-container {
+    background-color: #ffff;
+    padding: 20px;
+    margin-top: 0px;
+    border-radius: 5px;
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* NotificationFilter Title */
+  .notification-filter-title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  /* Checkbox Label */
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: 370px;
+  }
+  
+  /* Checkbox Input */
+  .checkbox-input {
+    margin-right: 10px;
+    
+  }
+
+
+  .square-button {
+    background-color: #6b839e;/* Gradient background */
+    color: #ffffff;
+    padding: 10px; /* Increased padding */
+    font-size: 18px; /* Slightly increased font size */
+    width: 180px;
+    margin-left: 470px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, color 0.3s ease; /* Smooth transitions for color and scale only */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Subtle box shadow */
+  }
+  
+  .square-button:hover {
+    background-color: #6b839e; /* Change gradient color on hover */
+    transform: scale(1.1); /* Slightly scale up on hover */
+    color: #212121; /* Change text color back to white on hover */
+  }
+  
+  /* Users Table */
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  /* Table Header Row */
+  .table-header-row {
+    background-color: #6b839e;
+    color: #ffffff;
+  }
+  
+  /* Table Header Cell */
+  .table-header-cell {
+    padding: 10px;
+    text-align: left;
+  }
+  
+  /* Table Body Row */
+  .table-body-row:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  /* Table Body Cell */
+  .table-body-cell {
+    padding: 10px;
+    text-align: left;
+  }
+  

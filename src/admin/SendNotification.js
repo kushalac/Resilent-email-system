@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+import Navbar from '../AdminNavbar';
 import '../css/Notification.css';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 
@@ -11,8 +11,8 @@ const SendNotification = () => {
   const [notificationType, setNotificationType] = useState('');
   const [notificationSubjects, setNotificationSubjects] = useState([]);
   const [selectedSubject, setSelectedSubject] = useState('');
-  const [notificationResult, setNotificationResult] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [ setNotificationResult] = useState('');
+  const [errorMessage] = useState('');
 
   useEffect(() => {
     // Fetch initial notification subjects
@@ -57,7 +57,7 @@ const SendNotification = () => {
 
       if (response.ok) {
         const data = await response.text();
-        setNotificationResult(data);
+        //setNotificationResult(data);
         
         // Show the result in an alert
         alert(data);
@@ -85,9 +85,6 @@ const SendNotification = () => {
     }
   };
 
-  const handleHomeClick = () => {
-    navigate('/admin');
-  };
 
   if (!adminAuthenticated) {
     navigate('/admin');

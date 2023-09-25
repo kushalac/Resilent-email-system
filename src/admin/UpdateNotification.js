@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../Navbar';
+import Navbar from '../AdminNavbar';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 function UpdateNotification() {
@@ -106,10 +106,6 @@ function UpdateNotification() {
           setErrorMessage('An error occurred. Please try again later.');
         }
       });
-  };
-
-  const handleHomeClick = () => {
-    navigate('/admin');
   };
 
   if (!adminAuthenticated) {

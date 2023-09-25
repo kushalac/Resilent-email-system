@@ -225,3 +225,13 @@ input[type="email"] {
 .nav-link-admin:hover {
   text-decoration: underline;
 }
+
+.logout-button {
+
+  /* Position the button to the top-right corner */
+  position: absolute;
+
+  right: 20px;
+}
+
+
