@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {  faUserEdit, faTrash, faSignOutAlt} from '@fortawesome/free-solid-svg-icons'; // Import relevant FontAwesome icons
-import Navbar from '../Navbar';
+import { faUserEdit, faTrash, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import Navbar from '../signinNavbar'; // Import the modified Navbar component
 import { useAuth } from '../admin/AuthContext';
-
 
 const SigninUser = () => {
   const navigate = useNavigate();
-  const { userAuthenticated,logoutUser } = useAuth();
+  const { userAuthenticated, logoutUser } = useAuth();
   const handleModifyUserClick = () => {
     navigate('/ModifyUser');
   };
@@ -22,9 +21,7 @@ const SigninUser = () => {
     navigate('/user');
   };
 
-
   useEffect(() => {
-    // Redirect to '/admin' if not authenticated
     if (!userAuthenticated) {
       navigate('/signin');
     }
@@ -32,29 +29,20 @@ const SigninUser = () => {
 
   return (
     <div className="admin-container">
+      {/* Use the Navbar component */}
       <Navbar />
       <div className="containerbuttons">
         <h1 className="typing-text">Welcome User</h1>
-
-        {/* Buttons Container */}
         <div className="button-container">
-
-          {/* User Modification Button */}
           <button className="square-button" onClick={handleModifyUserClick}>
             <FontAwesomeIcon icon={faUserEdit} />&nbsp;
             <span className="button-text">User Modification</span>
           </button>
-
-          {/* Delete Button */}
           <button className="square-button" onClick={handleDeleteClick}>
             <FontAwesomeIcon icon={faTrash} />&nbsp;
             <span className="button-text">Delete</span>
           </button>
-
-        <button className="square-button" onClick={handleLogout}>
-         <FontAwesomeIcon icon={faSignOutAlt} />&nbsp;
-        <span className="button-text">Logout</span>
-        </button>
+          
         </div>
       </div>
     </div>
@@ -62,4 +50,3 @@ const SigninUser = () => {
 };
 
 export default SigninUser;
-
