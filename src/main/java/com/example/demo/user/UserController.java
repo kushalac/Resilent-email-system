@@ -98,9 +98,14 @@ public class UserController {
             if (!passwordEncoder.matches(password, user.getPassword())) {
                 return ResponseEntity.badRequest().body("Incorrect password. Please try again.");
             }
+            if(user.isActive())
+            {
+            	return ResponseEntity.ok("Sign-in successful");
+            }
+            else {
+            	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
 
-            // Sign-in successful
-            return ResponseEntity.ok("Sign-in successful");
         } catch (Exception e) {
             // Handle the exception, log it, and return an error response
             e.printStackTrace();
