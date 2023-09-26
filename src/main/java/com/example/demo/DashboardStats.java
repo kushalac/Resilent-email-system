@@ -8,6 +8,14 @@ public class DashboardStats {
     private long latestPlansCount;
     private long releaseEventsCount;
     private long notReceiveNotificationsCount;
+    private long totalPromotionsCount;
+    private long totalReleaseEventsCount;
+    private long totalLatestPlansCount;
+    private long totalNotificationsCount;
+    private long totalPromotionsToUsersCount;
+    private long totalReleaseEventsToUsersCount;
+    private long totalLatestPlansToUsersCount;
+    private long totalNotificationSent;
 
     public DashboardStats() {
         // Default constructor
@@ -15,7 +23,9 @@ public class DashboardStats {
 
     public DashboardStats(long activeTrueCount, long activeFalseCount, long receiveNotificationsCount,
                           long promotionsCount, long latestPlansCount, long releaseEventsCount,
-                          long notReceiveNotificationsCount) {
+                          long notReceiveNotificationsCount,long totalPromotionsCount,long totalReleaseEventsCount, long totalLatestPlansCount,
+                          long totalNotificationsCount, long totalPromotionsToUsersCount,
+                          long totalReleaseEventsToUsersCount,long totalLatestPlansToUsersCount,long totalNotificationSent) {
         this.activeTrueCount = activeTrueCount;
         this.activeFalseCount = activeFalseCount;
         this.receiveNotificationsCount = receiveNotificationsCount;
@@ -23,9 +33,81 @@ public class DashboardStats {
         this.latestPlansCount = latestPlansCount;
         this.releaseEventsCount = releaseEventsCount;
         this.notReceiveNotificationsCount = notReceiveNotificationsCount;
+        this.totalPromotionsCount=totalPromotionsCount;
+        this.totalReleaseEventsCount=totalReleaseEventsCount;
+        this.totalLatestPlansCount=totalLatestPlansCount;
+        this.totalNotificationsCount=totalNotificationsCount;
+        this.totalPromotionsToUsersCount=totalPromotionsToUsersCount;
+        this.totalReleaseEventsToUsersCount=totalReleaseEventsToUsersCount;
+        this.totalLatestPlansToUsersCount=totalLatestPlansToUsersCount;
+        this.totalNotificationSent=totalNotificationSent;;
     }
 
-    public long getActiveTrueCount() {
+    public long getTotalPromotionsCount() {
+		return totalPromotionsCount;
+	}
+
+	public void setTotalPromotionsCount(long totalPromotionsCount) {
+		this.totalPromotionsCount = totalPromotionsCount;
+	}
+
+	public long getTotalReleaseEventsCount() {
+		return totalReleaseEventsCount;
+	}
+
+	public void setTotalReleaseEventsCount(long totalReleaseEventsCount) {
+		this.totalReleaseEventsCount = totalReleaseEventsCount;
+	}
+
+	public long getTotalLatestPlansCount() {
+		return totalLatestPlansCount;
+	}
+
+	public void setTotalLatestPlansCount(long totalLatestPlansCount) {
+		this.totalLatestPlansCount = totalLatestPlansCount;
+	}
+
+	public long getTotalNotificationsCount() {
+		return totalNotificationsCount;
+	}
+
+	public void setTotalNotificationsCount(long totalNotificationsCount) {
+		this.totalNotificationsCount = totalNotificationsCount;
+	}
+
+	public long getTotalPromotionsToUsersCount() {
+		return totalPromotionsToUsersCount;
+	}
+
+	public void setTotalPromotionsToUsersCount(long totalPromotionsToUsersCount) {
+		this.totalPromotionsToUsersCount = totalPromotionsToUsersCount;
+	}
+
+	public long getTotalReleaseEventsToUsersCount() {
+		return totalReleaseEventsToUsersCount;
+	}
+
+	public void setTotalReleaseEventsToUsersCount(long totalReleaseEventsToUsersCount) {
+		this.totalReleaseEventsToUsersCount = totalReleaseEventsToUsersCount;
+	}
+
+	public long getTotalLatestPlansToUsersCount() {
+		return totalLatestPlansToUsersCount;
+	}
+
+	public void setTotalLatestPlansToUsersCount(long totalLatestPlansToUsersCount) {
+		this.totalLatestPlansToUsersCount = totalLatestPlansToUsersCount;
+	}
+
+	public long getTotalNotificationSent() {
+		return totalNotificationSent;
+	}
+
+	public void setTotalNotificationSent(long totalNotificationSent) {
+		this.totalNotificationSent = totalNotificationSent;
+	}
+
+	public long getActiveTrueCount() {
         return activeTrueCount;
     }
 
