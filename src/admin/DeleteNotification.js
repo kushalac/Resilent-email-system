@@ -6,6 +6,8 @@ import { useAuth } from './AuthContext'; // Import the useAuth hook
 import { useNavigate } from 'react-router-dom';
 
 function DeleteNotification() {
+  
+  const Swal = require('sweetalert2');
   const navigate = useNavigate();
   const { adminAuthenticated} = useAuth();
 
@@ -37,7 +39,11 @@ function DeleteNotification() {
   const deleteNotification = useCallback(async (e) => {
     e.preventDefault(); 
     if (!selectedSubject) {
-      alert('Please select a notification subject.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Subject Missing!!',
+        text: 'Please Select a Notification Subject'
+      })
       return;
     }
   
@@ -50,17 +56,34 @@ function DeleteNotification() {
       });
   
       if (response.status === 200 || response.status === 204) {
-        alert('Notification deleted successfully.');
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!!',
+          text: 'Notification deleted successfully.'
+        })
         // Additional code to execute after successful deletion
       } else {
-        alert('Error deleting notification.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: 'Failed deleting the notification.'
+        })
         // Additional code to handle the error
       }
     } catch (error) {
       if (error.response) {
-        alert(`Error deleting notification: ${error.response.data.message}`);
+        const message =error.response.data.message;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: message
+        })
       } else {
-        alert('An error occurred while deleting the notification.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: 'An error occurred while deleting the notification.'
+        })
       }
       // Additional code to handle the error
     }

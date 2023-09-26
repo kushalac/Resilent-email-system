@@ -5,6 +5,8 @@ import '../css/Notification.css';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 const SendNotification = () => {
+  
+  const Swal = require('sweetalert2');
   const navigate = useNavigate();
   const { adminAuthenticated } = useAuth();
 
@@ -58,9 +60,11 @@ const SendNotification = () => {
       if (response.ok) {
         const data = await response.text();
         //setNotificationResult(data);
-        
-        // Show the result in an alert
-        alert(data);
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!!',
+          text: data
+        })
       } else {
         throw new Error(`Server response was not ok (status ${response.status})`);
       }

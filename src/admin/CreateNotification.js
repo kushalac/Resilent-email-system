@@ -6,6 +6,7 @@ import { useAuth } from './AuthContext';
 
 
 function CreateNotification() {
+  const Swal = require('sweetalert2');
   const navigate = useNavigate();
   const { adminAuthenticated } = useAuth();
 
@@ -27,7 +28,11 @@ function CreateNotification() {
       .post('http://localhost:8080/notification/createNotification', formData)
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
-          alert('Notification created and saved successfully.');
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!!',
+            text: 'Notification Created and Saved'
+          })
           setFormData({
             notificationType: 'promotions',
             notificationSubject: '',
@@ -39,9 +44,18 @@ function CreateNotification() {
       })
       .catch((error) => {
         if (error.response) {
-          setErrorMessage(error.response.data);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops!!',
+            text: error.response.data
+          })
         } else {
           setErrorMessage('An error occurred. Please try again later.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!!',
+            text: 'An error occurred. Please try again later.'
+          })
         }
       });
   };

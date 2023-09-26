@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import styles from "./NotificationFilter.module.css"; // Import your CSS module
-
+import '../css/Notification.css';
 function NotificationFilter() {
   const [selectedNotifications, setSelectedNotifications] = useState([]);
   const [users, setUsers] = useState([]);
@@ -32,7 +32,7 @@ function NotificationFilter() {
   return (
     
     <div className={styles["notification-filter-container"]}>
-      <h2 className={styles["notification-filter-title"]}>Filter Users by Notifications</h2>
+      <h2 className={styles["notification-filter-title"]}>Notification Subscribers Data</h2>
       <div className={styles["checkbox-label"]}>
         <label>
           <input
@@ -62,9 +62,11 @@ function NotificationFilter() {
           Release Events
         </label>
       </div>
-      <button className={styles["square-button"]} onClick={handleRetrieveUsers}>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <button className="create-button" onClick={handleRetrieveUsers}>
         Retrieve Users
       </button>
+      </div>
       {showTable && (
         <>
           <h2 className={styles["notification-filter-title"]}></h2>

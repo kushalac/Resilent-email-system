@@ -6,7 +6,7 @@ import Navbar from '../Navbar';
 
 function Signup() {
   const navigate = useNavigate();
-
+  const Swal = require('sweetalert2');
   const initialFormData = {
     name: '',
     email: '',
@@ -55,17 +55,29 @@ function Signup() {
 
     // Perform client-side validation
     if (!formData.name) {
-      alert('Please enter your name.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Name Missing!!',
+        text: 'Please enter your name'
+      })
       return;
     }
 
     if (!formData.email) {
-      alert('Please enter your email.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Email Missing!!',
+        text: 'Please enter your email'
+      })
       return;
     }
 
     if (!formData.password) {
-      alert('Please enter your password.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Password Missing!!',
+        text: 'Please enter your password'
+      })
       return;
     }
 
@@ -76,7 +88,11 @@ function Signup() {
         !formData.notifications.latestPlans &&
         !formData.notifications.releaseEvents
       ) {
-        alert('Please select at least one notification type.');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Notification Type Missing!!',
+          text: 'Please select at least one notification type.'
+        })
         return;
       }
     }
@@ -85,16 +101,27 @@ function Signup() {
       .post('http://localhost:8080/signup', formData)
       .then((response) => {
         if (response.status === 201) {
-          alert('User has been created successfully');
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!!',
+            text: 'User created successfully.'
+          })
           setFormData(initialFormData);
           navigate('/signin');
         } else {
-          alert(response.data.message);
+          Swal.fire({
+            icon: 'warning',
+            title: 'Oops!!',
+            text: response.data.message
+          })
         }
       })
       .catch((error) => {
-        console.error('Error:', error.response);
-        alert(error.response.data.message);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: error.response.data.message
+        })
       });
   };
 

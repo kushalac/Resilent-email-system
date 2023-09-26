@@ -4,6 +4,8 @@ import Navbar from '../signinNavbar';
 import { useLocation } from 'react-router-dom';
 
 function ModifyUser() {
+  
+  const Swal = require('sweetalert2');
   const location = useLocation();
   const userEmail = location.state?.userEmail;
   const { userAuthenticated } = useAuth();
@@ -51,15 +53,28 @@ function ModifyUser() {
       .then((response) => response.text())
       .then((message) => {
         if (message === 'User updated successfully') {
-          alert('User updated successfully');
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!!',
+            text: 'User updated successfully'
+          })
         } else {
-          alert('An error occurred while updating the user.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!!',
+            text: 'An error occurred while updating the user.'
+          })
+
         }
         setUserDataVisible(false); // Hide the user data modification section
       })
       .catch((error) => {
         console.error('Error:', error);
-        alert('An error occurred while updating the user.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: 'An error occurred while updating the user.'
+        })
         setUserDataVisible(false); // Hide the user data modification section
       });
   };
@@ -67,7 +82,11 @@ function ModifyUser() {
   const checkUser = () => {
     // Check if the email field is empty
     if (!email) {
-      alert('Please enter an email.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Email Missing!!',
+        text: 'Please enter your email'
+      })
       return;
     }
 
@@ -96,13 +115,21 @@ function ModifyUser() {
           // Check if Receive Notifications is checked and show/hide options accordingly
           toggleNotificationOptions();
         } else {
-          alert('User not found.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!!',
+            text: 'User not found.'
+          })
           setUserDataVisible(false); // Hide the user data modification section
         }
       })
       .catch((error) => {
         console.error('Error:', error);
-        alert(`An error occurred while checking the user: ${error.message}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: 'Some error occured during the process.'
+        })
         setUserDataVisible(false); // Hide the user data modification section
       });
   };

@@ -5,6 +5,8 @@ import Navbar from '../AdminNavbar';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 
 function UpdateNotification() {
+  
+  const Swal = require('sweetalert2');
   const navigate = useNavigate();
   const { adminAuthenticated } = useAuth();
 
@@ -73,7 +75,11 @@ function UpdateNotification() {
 
   const updateNotification = () => {
     if (!notificationSubject) {
-      alert('No notification subject selected.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Subject Missing!!',
+        text: 'Please Select a Notification Subject'
+      })
       return;
     }
 
@@ -81,7 +87,11 @@ function UpdateNotification() {
     const notificationExists = true; // Replace with your actual check
 
     if (!notificationExists) {
-      alert('Notification does not exist for updating.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Does not exist!!',
+        text: 'Notification does not exist for updating.'
+      })
       return;
     }
 
@@ -94,9 +104,18 @@ function UpdateNotification() {
       })
       .then((response) => {
         if (response.status === 200 || response.status === 201) {
-          alert('Notification updated successfully.');
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!!',
+            text: 'Notification updated successfully.'
+          })
+          
         } else {
-          alert('Error updating notification.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!!',
+            text: 'Failed updating the notification.'
+          })
         }
       })
       .catch((error) => {

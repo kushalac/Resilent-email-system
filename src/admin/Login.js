@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 import Navbar from '../Navbar';
+//import Swal from 'sweetalert2';
 
 const Login = () => {
+  const Swal = require('sweetalert2');
   const { loginAdmin } = useAuth(); // Use the login function from the AuthContext
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +16,11 @@ const Login = () => {
     if (username === 'admin' && password === 'admin') {
       loginAdmin(); // Call the login function to set the authenticated state to true
     } else {
-      alert('Invalid credentials. Please try again.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Invalid Credentials. Please try again!'
+      })
     }
   };
 

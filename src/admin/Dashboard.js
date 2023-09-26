@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import NotificationFilter from "./NotificationFilter";
+import NotificationFilterbyTime from "./NotificationFilterbytime";
 import styles from "./Dashboard.module.css"; // Import the CSS module
 import Navbar from '../AdminNavbar';
 import { useAuth } from './AuthContext';
@@ -19,6 +20,15 @@ const { adminAuthenticated } = useAuth();
     latestPlansCount: 0,
     releaseEventsCount: 0,
     notReceiveNotificationsCount: 0,
+    totalPromotionsCount: 0,
+    totalReleaseEventsCount: 0,
+    totalLatestPlansCount: 0,
+    totalNotificationsCount: 0,
+    totalPromotionsToUsersCount: 0,
+    totalReleaseEventsToUsersCount: 0,
+    totalLatestPlansToUsersCount: 0,
+    totalNotificationSent: 0
+
   });
 
   useEffect(() => {
@@ -60,7 +70,7 @@ const { adminAuthenticated } = useAuth();
       <Navbar />
     <div className={styles["dashboard-container"]}>
   <h1 className={styles["dashboard-title"]}>Dashboard Statistics</h1>
-  <button onClick={handleRefresh} className={styles["square-button"]}>
+  <button onClick={handleRefresh} className="create-button" style={{ marginLeft: '1000px' }}>
   <FontAwesomeIcon icon={faSync} />  Refresh
 </button>
   <div className={styles["dashboard-stats"]}>
@@ -88,7 +98,44 @@ const { adminAuthenticated } = useAuth();
       <h2 className={styles["dashboard-card-title"]}>Users Subscribed for Release Events</h2>
       <p className={styles["dashboard-stat"]}>{stats.releaseEventsCount}</p>
     </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Users not Subscribed for Notifications</h2>
+      <p className={styles["dashboard-stat"]}>{stats.notReceiveNotificationsCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Promotion Notifications</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalPromotionsCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Release events Notifications</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalReleaseEventsCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Latest plans Notifications</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalLatestPlansCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Total Notifications</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalNotificationsCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Promotion Notifications sent</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalPromotionsToUsersCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Release events Notifications sent</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalReleaseEventsToUsersCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Latest plans Notifications sent</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalLatestPlansToUsersCount}</p>
+    </div>
+    <div className={styles["dashboard-card"]}>
+      <h2 className={styles["dashboard-card-title"]}>Notifications sent</h2>
+      <p className={styles["dashboard-stat"]}>{stats.totalNotificationSent}</p>
+    </div>
     <NotificationFilter/>
+    <NotificationFilterbyTime/>
   </div>
  
 </div>

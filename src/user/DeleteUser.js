@@ -4,6 +4,8 @@ import { useLocation } from 'react-router-dom';
 import Navbar from '../signinNavbar';
 
 function DeleteUser() {
+  
+  const Swal = require('sweetalert2');
   const location = useLocation();
   const userEmail = location.state?.userEmail;
   const [email] = useState(userEmail || '');
@@ -30,9 +32,17 @@ function DeleteUser() {
         return response.json();
       })
       .then((data) => {
-        if (data.message) {
-          alert(data.message); // Display the server response message
-          window.location.href = '/signin';
+        if (data.message) { 
+          Swal.fire({
+            icon: 'info',
+            title: 'Please confirm your deletion!!',
+            text: data.message
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // User clicked "OK," so redirect to the /signin page
+              window.location.href = '/signin';
+            }
+          });
         } else {
           alert('User deleted successfully');
           // Redirect to the signup page after successful deletion
@@ -40,7 +50,11 @@ function DeleteUser() {
       })
       .catch((error) => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again later.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!!',
+          text: 'Some error occured during the process.'
+        })
       });
   };
 

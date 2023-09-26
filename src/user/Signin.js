@@ -7,6 +7,7 @@ import { useAuth } from '../admin/AuthContext';
 
 const Signin = () => {
   
+  const Swal = require('sweetalert2');
   const { loginUser } = useAuth();
   const navigate = useNavigate();
 
@@ -29,7 +30,11 @@ const Signin = () => {
   const handleSignIn = () => {
     // Perform client-side validation
     if (!formData.email || !formData.password) {
-      setError('Please enter both email and password.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Field Missing!!',
+        text: 'Please enter both email and password.'
+      })
       return;
     }
 
@@ -40,14 +45,22 @@ const Signin = () => {
           const userName = response.data;
           loginUser();
           navigate('/SigninUser', { state: { userEmail: formData.email,userName } }); // Redirect to the user page
-        } else {
-          // Handle sign-in failure, show error message
-          setError('Sign-in failed. Please check your credentials.');
+        }
+        else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!!',
+            text: 'An error occurred while signing in.'
+          })
         }
       })
       .catch((error) => {
         console.error('Error:', error);
-        setError('An error occurred while signing in.');
+        Swal.fire({
+          icon: 'error',
+          title: 'SignIn Failed!!',
+          text: 'Please check you credentials'
+        })
       });
   };
 
